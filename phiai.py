@@ -38,7 +38,7 @@ class Layer:
 
 
 class PhiAI:
-    def __init__(self, layer_shapes):
+    def __init__(self, layer_shapes, last_activation=False):
         """
         Neural Network Class - made by Max
         :param layer_shapes: Structure of the Neural Network in List-Format
@@ -49,6 +49,7 @@ class PhiAI:
         self.output = self.layers[self.size-1].output
 
         self.lr = 0.05
+        self.last_activation = last_activation
 
         self.digit_data = DigitData()
 
@@ -78,7 +79,8 @@ class PhiAI:
         curr_output = data
         for i in range(len(self.layers)):
             if i == len(self.layers) - 1:
-                return self.layers[i].ff(curr_output, False)
+                return self.layers[i].ff(curr_output, self.last_activation)
+                # return self.layers[i].ff(curr_output, False)
 
             curr_output = self.layers[i].ff(curr_output)
         self.output = self.layers[self.size - 1].output

@@ -219,7 +219,10 @@ def test_digit_ai():
     # digit_phi.digit_data.plot_data(X[5])
     # print(Y[5])
     digit_phi.predict(np.array([X[0]]))
-    print(digit_phi.layers[digit_phi.size-1].output)
+    print('Guessed: ', digit_phi.layers[digit_phi.size-1].output)
+    print('Expected: ', Y[0])
+    print('Error: ', digit_phi.loss(Y[0]))
+    print('Error Sum: ', np.sum(digit_phi.loss(Y[0])))
 
 
 if __name__ == '__main__':
