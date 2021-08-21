@@ -98,19 +98,25 @@ class PhiAI:
         delta = -2 * (target - self.layers[self.size-1].output)  # mult by d_activation if necessary
         if self.layers[self.size-1].activation:
             delta *= self.__activation(self.layers[self.size-1].z.T, 'log', True)
+
         for i in range(self.size - 1, 0, -1):
-            if i == self.size - 1:
-                self.layers[i].b -= delta * self.lr
-            else:
-                self.layers[i].b -= delta.T * self.lr
+            # ori:
+            # if i == self.size - 1:
+            #     self.layers[i].b -= delta * self.lr
+            # else:
+            #     ori: self.layers[i].b -= delta.T * self.lr
+            # ori: self.layers[i].w -= delta * self.layers[i - 1].output.T * self.lr
 
-            self.layers[i].w -= delta * self.layers[i - 1].output.T * self.lr
-            delta = np.matmul(self.layers[i].w, delta) * self.__activation(self.layers[i - 1].z.T, 'log', True)
-            # original: delta = delta * self.layers[i].w * self.__activation(self.layers[i - 1].z.T, 'log', True)
+            # ori: delta = np.matmul(self.layers[i].w, delta) * self.__activation(self.layers[i - 1].z.T, 'log', True)
+            self.layers[i].b -= delta * self.lr
+            self.layers[i].w -= np.matmul(delta.T, self.layers[i - 1].output).T * self.lr
 
-        self.layers[0].b -= delta.T * self.lr
-        self.layers[0].w -= (delta * self.last_input).T * self.lr
+            delta = np.matmul(self.layers[i].w, delta.T).T * self.__activation(self.layers[i - 1].z.T, 'log', True).T
 
+        # ori: self.layers[0].b -= delta.T * self.lr
+        # ori: self.layers[0].w -= (delta * self.last_input).T * self.lr
+        self.layers[0].b -= delta * self.lr
+        self.layers[0].w -= np.matmul(delta.T, self.last_input).T * self.lr
         return True
 
     def train(self, training, max_epochs=250, lowest_err=0.01):
