@@ -73,10 +73,6 @@ class PhiAI:
         :param data: Data to be processed by Phi-Neural-Network
         :return: Returns the calculated output
         """
-        #if data.shape[0] != self.layers[0].form[0]:
-        #    print('[ERR]: Dimensions do not match')
-        #    return -1
-
         self.last_input = data
         curr_output = data
         for i in range(len(self.layers)):
@@ -92,10 +88,18 @@ class PhiAI:
      TEST WITH ORIGINAL PROVED METHOD 
      IMPLEMENT BATCH-GRADIENT-DESCENT """
     # train and default train model
-    def adjust(self, target):
+    def adjust(self, y_train, x_train=None, method='stochastic', batch_size=10):
         """
         Adjusts Weights and Biases based on the calculated Gradients
-        :param target: The expected Output for the last used Inputs
+        :param y_train: The expected Output for the last used Inputs
+        :param x_train: Neural Network Input Data
+        :param method: Gradient Descent Variant to use 'stochastic' or 'minibatch'
+        :param batch_size: If minibatch Algorithm is used; batch size of minibatch
+        """
+        if method == 'stochastic':
+            self.stochastic_gd(y_train)
+        elif method == 'minibatch':
+            self.minibatch_gd(y_train, x_train, batch_size)
         """
         delta = -2 * (target - self.layers[self.size-1].output)
         if self.layers[self.size-1].activation:
@@ -120,6 +124,38 @@ class PhiAI:
         self.layers[0].b -= delta * self.lr
         self.layers[0].w -= np.matmul(delta.T, self.last_input).T * self.lr
         return True
+        """
+
+    def stochastic_gd(self, target):
+        delta = -2 * (target - self.layers[self.size - 1].output)
+        if self.layers[self.size - 1].activation:
+            delta *= self.__activation(self.layers[self.size - 1].z.T, 'log', True).T
+        for i in range(self.size - 1, 0, -1):
+            self.layers[i].b -= delta * self.lr
+            self.layers[i].w -= np.matmul(delta.T, self.layers[i - 1].output).T * self.lr
+            delta = np.matmul(self.layers[i].w, delta.T).T * self.__activation(self.layers[i - 1].z.T, 'log', True).T
+        self.layers[0].b -= delta * self.lr
+        self.layers[0].w -= np.matmul(delta.T, self.last_input).T * self.lr
+        return True
+
+    def minibatch_gd(self, y_train, x_train, batch_size):
+        print(self.create_batch(y_train, x_train, batch_size))
+
+    @staticmethod
+    def create_batch(Y, X, batch_size):
+        minibatches = []
+        print(X.shape, Y.shape)
+        data = np.stack((X, Y), axis=1)
+        np.random.shuffle(data)
+        n_batches = X.shape[0]//batch_size
+
+        for i in range(n_batches):
+            minbatch = data[i*batch_size: (i+1)*batch_size]
+            minibatches.append((minbatch[:, 0], minbatch[:, 1]))
+            if X.shape[0] % batch_size != 0:
+                minbatch = data[(i+1)*batch_size:]
+                minibatches.append((minbatch[:, 0], minbatch[:, 1]))
+        return minibatches
 
     def train(self, training, max_epochs=250, lowest_err=0.01):
         """
