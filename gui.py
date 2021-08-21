@@ -9,12 +9,12 @@ data = []
 color = 'black'
 canvas_w, canvas_h = 280, 280
 
+
 def locate_xy(event):
     global curr_x, curr_y
     curr_x, curr_y = event.x, event.y
-    #print(extract_pixel_data())
 
-def add_line(event, width=20):
+def add_line(event, width=int(canvas_w/28*2)):
     global curr_x, curr_y
     canvas.create_line((curr_x, curr_y, event.x, event.y), fill=color, smooth=1)
     curr_x, curr_y = event.x, event.y
@@ -39,17 +39,26 @@ def extract_pixel_data():
             img[data[i][0], data[i][1]] = 1
     return img
 
-def input_data():
-    plt.figure(figsize=(7, 7))
-
+def input_data(plot=True):
     grid_data = extract_pixel_data().T
     grid_data = cv2.resize(grid_data, (28, 28))
-    plt.imshow(grid_data, interpolation='none', cmap='gray')
-    plt.show()
+
+    if plot:
+        plt.figure(figsize=(7, 7))
+        plt.imshow(grid_data, interpolation='none', cmap='gray')
+        plt.show()
+    return grid_data
+
+def display_pallete():
+    idC = canvas.create_rectangle((10, 10, 30, 30), fill='black')
+    canvas.tag_bind(idC, '<Button-1>', lambda x: show_color('black'))
+    idC = canvas.create_rectangle((10, 40, 30, 60), fill='ghost white')
+    canvas.tag_bind(idC, '<Button-1>', lambda x: new_canvas())
+    idB = canvas.create_rectangle((10, 70, 30, 90), fill='gray')
+    canvas.tag_bind(idB, '<Button-1>', lambda x: input_data())
 
 
 window = Tk()
-
 window.title("phiAI")
 window.geometry("750x450")
 window.rowconfigure(0, weight=1)
@@ -57,7 +66,6 @@ window.columnconfigure(0, weight=1)
 
 menubar = Menu(window)
 window.config(menu=menubar)
-
 submenu = Menu(menubar, tearoff=0)
 menubar.add_cascade(label='File', menu=submenu)
 submenu.add_command(label='New Canvas', command=new_canvas)
@@ -65,19 +73,10 @@ submenu.add_command(label='New Canvas', command=new_canvas)
 canvas = Canvas(window, background='white')
 canvas.grid(row=0, column=0)
 canvas.config(width=canvas_w, height=canvas_h)
-#canvas.create_line(20, 20, 80, 60)
+
 canvas.bind('<Button-1>', locate_xy)
 canvas.bind('<B1-Motion>', add_line)
 
-def display_pallete():
-    idC = canvas.create_rectangle((10, 10, 30, 30), fill='black')
-    canvas.tag_bind(idC, '<Button-1>', lambda x: show_color('black'))
-    idC = canvas.create_rectangle((10, 40, 30, 60), fill='ghost white')
-    canvas.tag_bind(idC, '<Button-1>', lambda x: show_color('white'))
-    idB = canvas.create_rectangle((10, 70, 30, 90), fill='gray')
-    canvas.tag_bind(idB, '<Button-1>', lambda x: input_data())
-
 
 display_pallete()
-
 window.mainloop()

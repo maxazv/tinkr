@@ -1,43 +1,7 @@
 import numpy as np
 import math
-from train_digit import DigitData
-
-
-class Layer:
-    def __init__(self, data_n, output_n):
-        """
-        Utilised by the PhiAI a single Layer which consists of Weights, Biases, "activated"-Value and an
-        Output based on the previous named Parameters
-        :param data_n: Amount of Neurons of (the previous) Layer
-        :param output_n: Amount of Neurons of the next Layer
-        """
-        self.w = np.random.normal(0, 1, size=(data_n, output_n))
-        self.b = np.zeros((1, output_n))
-
-        self.z = 0
-        self.output = 0
-        self.form = (data_n, output_n)
-
-        self.activation = False
-
-    def ff(self, data, activation=True, precision=20):
-        """
-        Calculates the output of a single Layer with the according weights, biases and provided data
-        :param data: The Contents/ Output of the previous Layer
-        :param activation: Whether the Output should be transformed via an Activation-Function
-        :param precision: Amount of decimal places in the output
-        :return: Output of the Layer in numpy.arr-format
-        """
-        self.activation = activation
-        a = np.matmul(data, self.w) + self.b
-        self.z = a
-        # overflow in power
-        if activation:
-            self.output = np.log(1 + np.power(math.e, a))
-            return self.output
-        self.output = a
-        return self.output
-
+from PhiAI.layer import Layer
+from data_config import DigitData
 
 class PhiAI:
     def __init__(self, layer_shapes, last_activation=False):
@@ -84,9 +48,6 @@ class PhiAI:
         self.output = self.layers[self.size - 1].output
         return curr_output
 
-    """ TO BE OPTIMISED HEAVILY -> PROBLEM: Transpose/ Shapes of Matrices
-     TEST WITH ORIGINAL PROVED METHOD 
-     IMPLEMENT BATCH-GRADIENT-DESCENT """
     # train and default train model
     def adjust(self, y_train, x_train=None, method='stochastic', batch_size=10):
         """
@@ -130,32 +91,19 @@ class PhiAI:
         delta = -2 * (target - self.layers[self.size - 1].output)
         if self.layers[self.size - 1].activation:
             delta *= self.__activation(self.layers[self.size - 1].z.T, 'log', True).T
+
         for i in range(self.size - 1, 0, -1):
             self.layers[i].b -= delta * self.lr
             self.layers[i].w -= np.matmul(delta.T, self.layers[i - 1].output).T * self.lr
             delta = np.matmul(self.layers[i].w, delta.T).T * self.__activation(self.layers[i - 1].z.T, 'log', True).T
+
         self.layers[0].b -= delta * self.lr
         self.layers[0].w -= np.matmul(delta.T, self.last_input).T * self.lr
         return True
 
-    def minibatch_gd(self, y_train, x_train, batch_size):
-        print(self.create_batch(y_train, x_train, batch_size))
-
-    @staticmethod
-    def create_batch(Y, X, batch_size):
-        minibatches = []
-        print(X.shape, Y.shape)
-        data = np.stack((X, Y), axis=1)
-        np.random.shuffle(data)
-        n_batches = X.shape[0]//batch_size
-
-        for i in range(n_batches):
-            minbatch = data[i*batch_size: (i+1)*batch_size]
-            minibatches.append((minbatch[:, 0], minbatch[:, 1]))
-            if X.shape[0] % batch_size != 0:
-                minbatch = data[(i+1)*batch_size:]
-                minibatches.append((minbatch[:, 0], minbatch[:, 1]))
-        return minibatches
+    """ TO BE RESEARCHED/ IMPLEMENTED """
+    def minibatch_gd(self, y_train, x_train, batch_size, max_epochs=1000):
+        pass
 
     def train(self, training, max_epochs=250, lowest_err=0.01):
         """
@@ -173,7 +121,6 @@ class PhiAI:
                 i = 0
                 err = 0
                 if err < lowest_err:
-                    print('REACHED')
                     return
                 np.random.shuffle(training)
             c += 1
