@@ -13,9 +13,12 @@ class Layer:
         """
         self.w = np.random.normal(0, 1, size=(data_n, output_n))
         self.b = np.zeros((1, output_n))
+
         self.z = 0
         self.output = 0
         self.form = (data_n, output_n)
+
+        self.activation = False
 
     def ff(self, data, activation=True):
         """
@@ -24,10 +27,11 @@ class Layer:
         :param activation: Whether the Output should be transformed via an Activation-Function
         :return: Output of the Layer in numpy.arr-format
         """
+        self.activation = activation
         a = np.matmul(data, self.w) + self.b
         self.z = a
         if activation:
-            self.output = np.log(1 + math.e ** a)
+            self.output = np.log(1 + np.power(math.e, a))
             return self.output
         self.output = a
         return self.output
@@ -66,9 +70,9 @@ class PhiAI:
         :param data: Data to be processed by Phi-Neural-Network
         :return: Returns the calculated output
         """
-        if data.shape[0] != self.layers[0].form[0]:
-            print('[ERR]: Dimensions do not match')
-            return -1
+        #if data.shape[0] != self.layers[0].form[0]:
+        #    print('[ERR]: Dimensions do not match')
+        #    return -1
 
         self.last_input = data
         curr_output = data
@@ -89,7 +93,9 @@ class PhiAI:
         Adjusts Weights and Biases based on the calculated Gradients
         :param target: The expected Output for the last used Inputs
         """
-        delta = -2 * (target - self.layers[self.size - 1].output)  # mult by d_activation if necessary
+        delta = -2 * (target - self.layers[self.size-1].output)  # mult by d_activation if necessary
+        if self.layers[self.size-1].activation:
+            delta *= self.__activation(self.layers[self.size-1].z.T, 'log', True)
         for i in range(self.size - 1, 0, -1):
             if i == self.size - 1:
                 self.layers[i].b -= delta * self.lr
@@ -153,7 +159,7 @@ class PhiAI:
         train_data_y = DigitData.one_hot(Y_t)
         return train_data_y, X_t
 
-    def train_digit(self, train_x, train_y, max_epochs=500, lowest_err=0.001):
+    def train_digit(self, train_y, train_x, max_epochs=500, lowest_err=0.1):
         err, c = 0, 0
         for i in range(max_epochs):
             self.predict(train_x[i])
@@ -161,6 +167,7 @@ class PhiAI:
             err += (train_y[i] - self.layers[self.size - 1].output) ** 2
             if c % 5 == 0:
                 print('Iteration: ', c)
-                if err < 0.1:
-                    return True
+                if err < lowest_err:
+                    return -1
                 err = 0
+        return 1

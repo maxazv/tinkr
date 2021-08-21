@@ -25,8 +25,9 @@ class DigitData:
         plt.show()
 
     @staticmethod
-    def normalize(d):
-        pass
+    def normalize(dt, val):
+        dt = dt/val
+        return dt
 
     def load(self, path='digit_recognizer_data/train.csv'):
         self.path = path

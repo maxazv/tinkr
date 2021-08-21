@@ -77,7 +77,6 @@ def test_neuralnet():
     '''
 """
 
-
 def delta_log(x):
     return math.e ** x / (1 + math.e ** x)
 
@@ -192,6 +191,7 @@ def test_ai(ptest, verbose=0, testcase=0):
         print(f'Adjusted Guess: {nnv2.layers[nnv2.size - 1].output}')
         print(f'Expected: {t_data[test_i][1]}')
         print(f'Adjusted Guess Error: {nnv2.loss(t_data[test_i][1])}')
+        # print(nnv2.layers[0].output.shape)
 
         if verbose > 1:
             nnv2.train(t_data)
@@ -210,14 +210,23 @@ def test_ai(ptest, verbose=0, testcase=0):
 
 def test_digit_ai():
     digit_phi = PhiAI([784, 15, 15, 10])
-    print(digit_phi.pull_model())
-    #digit_phi.load_data()
+    # print(digit_phi.pull_model())
+
+    # configure target and corresponding data set
+    Y, X = digit_phi.load_data()
+    X = digit_phi.digit_data.normalize(X, 255)
+    # plot data
+    # digit_phi.digit_data.plot_data(X[5])
+    # print(Y[5])
+    digit_phi.predict(np.array([X[0]]))
+    print(digit_phi.layers[digit_phi.size-1].output)
 
 
 if __name__ == '__main__':
-    # test_digit_ai()
-
+    test_digit_ai()
+    '''
     test = 2
     verbose_level = 1
     test_case = 0
     test_ai(test, verbose_level, test_case)
+    '''
