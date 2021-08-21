@@ -44,13 +44,4 @@ class DigitData:
         Y_train = data_train[0]
         X_train = data_train[1:self.form[1]]
 
-        return Y_train, X_train
-
-
-data = DigitData()
-data.load()
-Y_t, X_t = data.setup_data()
-train_data_y = DigitData.one_hot(Y_t)
-print(train_data_y[100])
-DigitData.plot_data(X_t.T[100])
-#print(X_t.T[100])
+        return Y_train, X_train.T

@@ -208,15 +208,15 @@ def test_ai(ptest, verbose=0, testcase=0):
             print("\nExpected:", t_data[2][1])
             print("Predicted:", nnv2.loss(t_data[2][1]))
 
+def test_digit_ai():
+    digit_phi = PhiAI([784, 15, 15, 10])
+    print(digit_phi.pull_model())
+    #digit_phi.load_data()
+
 
 if __name__ == '__main__':
-    '''
-    m = [[1, 2, 3],
-         [4, 5, 6],
-         [7, 8, 9]]
-    m = tomfoolery(m)
-    print(m)
-    '''
+    # test_digit_ai()
+
     test = 2
     verbose_level = 1
     test_case = 0

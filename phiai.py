@@ -1,5 +1,6 @@
 import numpy as np
 import math
+from train_digit import DigitData
 
 
 class Layer:
@@ -45,6 +46,8 @@ class PhiAI:
 
         self.lr = 0.05
 
+        self.digit_data = DigitData()
+
     @staticmethod
     def __activation(x, method='log', prime=True):
         if prime:
@@ -80,6 +83,7 @@ class PhiAI:
     """ TO BE OPTIMISED HEAVILY -> PROBLEM: Transpose/ Shapes of Matrices
      TEST WITH ORIGINAL PROVED METHOD 
      IMPLEMENT BATCH-GRADIENT-DESCENT """
+    # train and default train model
     def adjust(self, target):
         """
         Adjusts Weights and Biases based on the calculated Gradients
@@ -122,28 +126,32 @@ class PhiAI:
                 np.random.shuffle(training)
             c += 1
 
+    # load and extract current nn model
     def load_model(self, layers):
         if len(self.layers) != len(layers):
             return False
-
         for i in range(len(layers)):
             shape = layers[i][0].shape
             if shape != self.layers[i].form:
                 return False
-
             curr = Layer(shape[0], shape[1])
             curr.w = layers[i][0]
             curr.b = layers[i][1]
-
             self.layers[i] = curr
         return True
 
     def pull_model(self):
         model = []
-        for i in range(self.size-1):
+        for i in range(self.size):
             model.append((self.layers[i].w, self.layers[i].b))
-
         return model
+
+    # digit data configuration and training
+    def load_data(self, path='digit_recognizer_data/train.csv'):
+        self.digit_data.load(path)
+        Y_t, X_t = self.digit_data.setup_data()
+        train_data_y = DigitData.one_hot(Y_t)
+        return train_data_y, X_t
 
     def train_digit(self, train_x, train_y, max_epochs=500, lowest_err=0.001):
         err, c = 0, 0
