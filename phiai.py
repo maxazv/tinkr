@@ -139,3 +139,6 @@ class PhiAI:
 
             self.layers[i] = curr
         return True
+
+    def pull_model(self):
+        print(self.layers)
