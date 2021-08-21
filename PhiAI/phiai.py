@@ -42,7 +42,6 @@ class PhiAI:
         for i in range(len(self.layers)):
             if i == len(self.layers) - 1:
                 return self.layers[i].ff(curr_output, self.last_activation)
-                # return self.layers[i].ff(curr_output, False)
 
             curr_output = self.layers[i].ff(curr_output)
         self.output = self.layers[self.size - 1].output
@@ -61,31 +60,6 @@ class PhiAI:
             self.stochastic_gd(y_train)
         elif method == 'minibatch':
             self.minibatch_gd(y_train, x_train, batch_size)
-        """
-        delta = -2 * (target - self.layers[self.size-1].output)
-        if self.layers[self.size-1].activation:
-            delta *= self.__activation(self.layers[self.size-1].z.T, 'log', True).T
-
-        for i in range(self.size - 1, 0, -1):
-            # ori:
-            # if i == self.size - 1:
-            #     self.layers[i].b -= delta * self.lr
-            # else:
-            #     ori: self.layers[i].b -= delta.T * self.lr
-            # ori: self.layers[i].w -= delta * self.layers[i - 1].output.T * self.lr
-
-            # ori: delta = np.matmul(self.layers[i].w, delta) * self.__activation(self.layers[i - 1].z.T, 'log', True)
-            self.layers[i].b -= delta * self.lr
-            self.layers[i].w -= np.matmul(delta.T, self.layers[i - 1].output).T * self.lr
-
-            delta = np.matmul(self.layers[i].w, delta.T).T * self.__activation(self.layers[i - 1].z.T, 'log', True).T
-
-        # ori: self.layers[0].b -= delta.T * self.lr
-        # ori: self.layers[0].w -= (delta * self.last_input).T * self.lr
-        self.layers[0].b -= delta * self.lr
-        self.layers[0].w -= np.matmul(delta.T, self.last_input).T * self.lr
-        return True
-        """
 
     def stochastic_gd(self, target):
         delta = -2 * (target - self.layers[self.size - 1].output)
