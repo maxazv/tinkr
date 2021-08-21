@@ -108,8 +108,6 @@ class PhiAI:
         :param max_epochs: The maximum training iterations before the Neural Network stops its training
         :param lowest_err: The lowest error value before the Neural Network stops its training
         """
-        lowest_err = lowest_err
-        max_epochs = max_epochs
         c, err, i = (0, ) * 3
         while c < max_epochs:
             self.adjust(training[i][1])
@@ -141,4 +139,20 @@ class PhiAI:
         return True
 
     def pull_model(self):
-        print(self.layers)
+        model = []
+        for i in range(self.size-1):
+            model.append((self.layers[i].w, self.layers[i].b))
+
+        return model
+
+    def train_digit(self, train_x, train_y, max_epochs=500, lowest_err=0.001):
+        err, c = 0, 0
+        for i in range(max_epochs):
+            self.predict(train_x[i])
+            self.adjust(train_y[i])
+            err += (train_y[i] - self.layers[self.size - 1].output) ** 2
+            if c % 5 == 0:
+                print('Iteration: ', c)
+                if err < 0.1:
+                    return True
+                err = 0
