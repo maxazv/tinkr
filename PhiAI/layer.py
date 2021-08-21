@@ -24,7 +24,6 @@ class Layer:
         Calculates the output of a single Layer with the according weights, biases and provided data
         :param data: The Contents/ Output of the previous Layer
         :param activation: Whether the Output should be transformed via an Activation-Function
-        :param precision: Amount of decimal places in the output
         :return: Output of the Layer in numpy.arr-format
         """
         self.activation = activation
