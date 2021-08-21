@@ -209,7 +209,7 @@ def test_ai(ptest, verbose=0, testcase=0):
             print("Predicted:", nnv2.loss(t_data[2][1]))
 
 def test_digit_ai():
-    digit_phi = PhiAI([784, 15, 15, 10])
+    digit_phi = PhiAI([784, 15, 15, 10], True)
     # print(digit_phi.pull_model())
 
     # configure target and corresponding data set
@@ -219,18 +219,24 @@ def test_digit_ai():
     # digit_phi.digit_data.plot_data(X[5])
     # print(Y[5])
     digit_phi.predict(np.array([X[0]]))
-    # print('Guessed: ', digit_phi.layers[digit_phi.size-1].output)
-    # print('Expected: ', Y[0])
-    # print('Error: ', digit_phi.loss(Y[0]))
-    # print('Error Sum: ', np.sum(digit_phi.loss(Y[0])))
+    #print('Guessed: ', digit_phi.layers[digit_phi.size-1].output)
+    #print('Expected: ', Y[0])
+    #print('Error: ', digit_phi.loss(Y[0]))
+    #print('Error Sum: ', np.sum(digit_phi.loss(Y[0])))
+    #print('--------------------------------')
     digit_phi.adjust(Y[0])
+    digit_phi.predict(np.array([X[0]]))
+    #print(f'Adjusted Guess: {digit_phi.layers[digit_phi.size - 1].output}')
+    #print(f'Expected: {Y[0]}')
+    #print(f'Adjusted Guess Error: {np.sum(digit_phi.loss(Y[0]))}')
 
 
 if __name__ == '__main__':
-    test_digit_ai()
-    '''
-    test = 2
-    verbose_level = 1
-    test_case = 0
-    test_ai(test, verbose_level, test_case)
-    '''
+    digit = 1
+    if digit == 0:
+        test_digit_ai()
+    else:
+        test = 2
+        verbose_level = 1
+        test_case = 0
+        test_ai(test, verbose_level, test_case)

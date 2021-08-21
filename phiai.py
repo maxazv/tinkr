@@ -20,16 +20,18 @@ class Layer:
 
         self.activation = False
 
-    def ff(self, data, activation=True):
+    def ff(self, data, activation=True, precision=20):
         """
         Calculates the output of a single Layer with the according weights, biases and provided data
         :param data: The Contents/ Output of the previous Layer
         :param activation: Whether the Output should be transformed via an Activation-Function
+        :param precision: Amount of decimal places in the output
         :return: Output of the Layer in numpy.arr-format
         """
         self.activation = activation
         a = np.matmul(data, self.w) + self.b
         self.z = a
+        # overflow in power
         if activation:
             self.output = np.log(1 + np.power(math.e, a))
             return self.output
@@ -95,9 +97,9 @@ class PhiAI:
         Adjusts Weights and Biases based on the calculated Gradients
         :param target: The expected Output for the last used Inputs
         """
-        delta = -2 * (target - self.layers[self.size-1].output)  # mult by d_activation if necessary
+        delta = -2 * (target - self.layers[self.size-1].output)
         if self.layers[self.size-1].activation:
-            delta *= self.__activation(self.layers[self.size-1].z.T, 'log', True)
+            delta *= self.__activation(self.layers[self.size-1].z.T, 'log', True).T
 
         for i in range(self.size - 1, 0, -1):
             # ori:
