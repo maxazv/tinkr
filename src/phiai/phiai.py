@@ -1,7 +1,7 @@
 import numpy as np
 import math
-from PhiAI.layer import Layer
-from data_config import DigitData
+from src.phiai.layer import Layer
+from src.data_config import DigitData
 
 class PhiAI:
     def __init__(self, layer_shapes, last_activation=False):
@@ -120,7 +120,7 @@ class PhiAI:
         return model
 
     # digit data configuration and training
-    def load_data(self, path='digit_recognizer_data/train.csv'):
+    def load_data(self, path='res/train.csv'):
         self.digit_data.load(path)
         Y_t, X_t = self.digit_data.setup_data()
         train_data_y = DigitData.one_hot(Y_t)

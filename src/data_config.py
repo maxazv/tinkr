@@ -29,7 +29,7 @@ class DigitData:
         dt = dt/val
         return dt
 
-    def load(self, path='digit_recognizer_data/train.csv'):
+    def load(self, path='res/train.csv'):
         self.path = path
         self.data = pd.read_csv(self.path)
         self.data = np.array(self.data)

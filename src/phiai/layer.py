@@ -4,7 +4,7 @@ import math
 class Layer:
     def __init__(self, data_n, output_n):
         """
-        Utilised by the PhiAI a single Layer which consists of Weights, Biases, "activated"-Value and an
+        Utilised by the phiai a single Layer which consists of Weights, Biases, "activated"-Value and an
         Output based on the previous named Parameters
         :param data_n: Amount of Neurons of (the previous) Layer
         :param output_n: Amount of Neurons of the next Layer

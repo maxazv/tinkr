@@ -1,7 +1,7 @@
 import numpy as np
 import math
-from PhiAI.phiai import PhiAI
-from PhiAI.phiai import Layer
+from src.phiai.phiai import PhiAI
+from src.phiai.phiai import Layer
 
 def delta_log(x):
     return math.e ** x / (1 + math.e ** x)
@@ -71,7 +71,7 @@ def test_ai(ptest, verbose=0, testcase=0):
 
     elif cl_test == 1:
         """ -***-[ Neural Network Class ]-***- """
-        # Test PhiAI Class
+        # Test phiai Class
         # + first prediction
         nn.predict(np.array([t_data[test_i][0]]))
         n_v1 = nn.layers[nn.size - 1].output
