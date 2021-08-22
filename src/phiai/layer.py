@@ -6,11 +6,10 @@ class Layer:
         """Single Neural Network Layer of shape (`data_n`, `output_n`)"""
         self.w = np.random.normal(0, 1, size=(data_n, output_n))
         self.b = np.zeros((1, output_n))
-
         self.z = 0
         self.output = 0
-        self.form = (data_n, output_n)
 
+        self.form = (data_n, output_n)
         self.activation = False
 
     """ OVERFLOW ERROR """

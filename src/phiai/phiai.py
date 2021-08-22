@@ -4,15 +4,17 @@ from src.phiai.layer import Layer
 from src.data_config import DigitData
 
 class PhiAI:
-    def __init__(self, layer_shapes, last_activation=False):
+    def __init__(self, layer_shapes, last_activation=False, batch_size=1):
         """Neural Network Class with layer-format described by `layer_shapes` - made by maxazv"""
         self.size = len(layer_shapes) - 1
         self.last_input = -1
-        self.layers = [Layer(layer_shapes[i], layer_shapes[i + 1]) for i in range(self.size)]
+        self.layers = [Layer(layer_shapes[i], layer_shapes[i+1]) for i in range(self.size)]
+
         self.output = self.layers[self.size-1].output
 
         self.lr = 0.05
         self.last_activation = last_activation
+        self.batch_size = batch_size
 
         self.digit_data = DigitData()
 
@@ -41,46 +43,63 @@ class PhiAI:
         return curr_output
 
     # train and default train model
-    def adjust(self, y_train, x_train=None, method='stochastic', batch_size=10):
+    def adjust(self, y_train, x_train=None, method='stochastic'):
         """Adjusts Weights and Biases based on the calculated Gradients with `method`"""
         if method == 'stochastic':
             self.backprop(y_train)
         elif method == 'minibatch':
-            self.minibatch_gd(y_train, x_train, batch_size)
+            self.minibatch_gd(y_train, x_train, self.batch_size)
 
-    def backprop(self, target, stochastic=True, batch_size=0):
+    def backprop(self, target, stochastic=True):
         delta = -2 * (target - self.layers[self.size - 1].output)
         if self.layers[self.size - 1].activation:
             delta *= self.__activation(self.layers[self.size - 1].z.T, 'log', True).T
 
         for i in range(self.size - 1, 0, -1):
-            delta_b = delta * self.lr
-            delta_w = np.matmul(delta.T, self.layers[i - 1].output).T * self.lr
             if stochastic:
-                # orig: self.layers[i].b -= delta * self.lr
-                # orig: self.layers[i].w -= np.matmul(delta.T, self.layers[i - 1].output).T * self.lr
-                self.layers[i].b -= self.__fit(delta_b)
-                self.layers[i].w -= self.__fit(delta_w)
+                self.layers[i].b -= delta * self.lr
+                self.layers[i].w -= np.matmul(delta.T, self.layers[i - 1].output).T * self.lr
             else:
-                self.layers[i].b -= self.__fit(delta_b, stochastic, batch_size)
-                self.layers[i].w -= self.__fit(delta_w, stochastic, batch_size)
+                print("\n", i)
+                delta_b = delta * self.lr
+                print(delta_b.shape)
+                print(self.layers[i].b.shape)
+                print(np.array([1/self.batch_size * np.sum(delta_b, axis=0)]).shape)
+                """[!] Batch size might not represent current input dimensions"""
+                self.layers[i].b -= np.array([1/self.batch_size * np.sum(delta_b, axis=1)])
+
+                tnsp_delta = np.array([delta[0]]).T
+                tnsp_output = np.array([self.layers[i-1].output[0]])
+                delta_w = np.matmul(tnsp_delta, tnsp_output).T * self.lr
+                for j in range(delta.shape[0]-1):
+                    tnsp_delta = np.array([delta[j]]).T
+                    tnsp_output = np.array([self.layers[i-1].output[j]])
+                    delta_w += np.matmul(tnsp_delta, tnsp_output).T * self.lr
+                self.layers[i].w -= 1/self.batch_size * delta_w
 
             delta = np.matmul(self.layers[i].w, delta.T).T * self.__activation(self.layers[i - 1].z.T, 'log', True).T
 
-        self.layers[0].b -= delta * self.lr
-        self.layers[0].w -= np.matmul(delta.T, self.last_input).T * self.lr
+        print('REACHED')
+        if stochastic:
+            self.layers[0].b -= delta * self.lr
+            self.layers[0].w -= np.matmul(delta.T, self.last_input).T * self.lr
+        else:
+            delta = delta
+            delta_b = delta * self.lr
+            self.layers[0].b -= np.array([1/self.batch_size * np.sum(delta_b, axis=1)])
+
+            tnsp_delta = np.array([delta[0]]).T
+            tnsp_output = np.array([self.layers[0].output[0]])
+            delta_w = np.matmul(tnsp_delta, tnsp_output).T * self.lr
+            for j in range(delta.shape[0] - 1):
+                tnsp_delta = np.array([delta[j]]).T
+                tnsp_output = np.array([self.layers[0].output[j]])
+                delta_w += np.matmul(tnsp_delta, tnsp_output).T * self.lr
+            self.layers[0].w -= 1 / self.batch_size * delta_w
         return True
 
-    @staticmethod
-    def __fit(val, stochastic=True, batch_size=0):
-        if stochastic:
-            return val
-        else:
-            """[!] Batch size might not represent current input dimensions"""
-            return 1/batch_size * np.sum(val, axis=(0, 1))
-
-    def minibatch_gd(self, y_train, x_train, batch_size, max_epochs=1000):
-        minibatches = self.create_batches(y_train, x_train, batch_size)
+    def minibatch_gd(self, y_train, x_train, max_epochs=1000):
+        minibatches = self.create_batches(y_train, x_train, self.batch_size)
         mse = 100
         for i in range(1):  # usually len(minibatches) but im testing
             if i > max_epochs:
@@ -88,13 +107,14 @@ class PhiAI:
             if mse < 0.01:
                 return
             self.predict(minibatches[i][1])
-            #self.backprop(np.array([minibatches[i][0]]), False, batch_size)
+            self.backprop(np.array(minibatches[i][0]), False)
             #mse = np.sum(self.loss(np.array([minibatches[i][0]])))
             return mse
 
     @staticmethod
     def create_batches(y_t, x_t, batch_size):
         minibatches = []
+        y_batch, x_batch = None, None
         for i in range(y_t.shape[0]//batch_size):
             y_batch = y_t[i*batch_size:(i+1)*batch_size]
             x_batch = x_t[i*batch_size:(i+1)*batch_size]

@@ -16,20 +16,15 @@ def test_ai(ptest, verbose=0, testcase=0):
               [1, 0]]
     test_i = testcase
 
-    nn = PhiAI([1, 2, 1])
-    nnv2 = PhiAI([1, 2, 2, 1])
-
-    # Layer Class
-    X = [0, 0.5, 1]
-    Y_H = [0, 1, 0]
-    k = testcase
-
-    h = Layer(1, 2)
-    y = Layer(2, 1)
-    lr = 0.075
-
     if cl_test == 0:
         # --[ Feedforward Algorithm ]--
+        X = [0, 0.5, 1]
+        Y_H = [0, 1, 0]
+        k = testcase
+
+        h = Layer(1, 2)
+        y = Layer(2, 1)
+        lr = 0.075
 
         h.ff(np.array([X[k]]))
         y.ff(h.output, False)
@@ -71,6 +66,8 @@ def test_ai(ptest, verbose=0, testcase=0):
 
     elif cl_test == 1:
         """ -***-[ Neural Network Class ]-***- """
+        nn = PhiAI([1, 2, 1])
+
         # Test phiai Class
         # + first prediction
         nn.predict(np.array([t_data[test_i][0]]))
@@ -106,6 +103,8 @@ def test_ai(ptest, verbose=0, testcase=0):
             print("Predicted:", nn.loss(t_data[2][1]))
 
     elif cl_test == 2:
+        nnv2 = PhiAI([1, 2, 2, 1])
+
         nnv2.predict(np.array([t_data[test_i][0]]))
         print(f'First Guess: {nnv2.layers[nnv2.size-1].output}')
         print(f'Expected: {t_data[test_i][1]}')
@@ -134,24 +133,28 @@ def test_ai(ptest, verbose=0, testcase=0):
             print("Predicted:", nnv2.loss(t_data[2][1]))
 
 def test_digit_ai():
-    digit_phi = PhiAI([784, 15, 15, 10], True)
-
+    #digit_phi = PhiAI([784, 15, 15, 10], True)
+    digit_phi_batched = PhiAI([784, 15, 15, 10], True, 10)
     # configure target and corresponding data set
-    Y, X = digit_phi.load_data()
-    X = digit_phi.digit_data.normalize(X, 255)
+    Y, X = digit_phi_batched.load_data()
+    X = digit_phi_batched.digit_data.normalize(X, 255)
+    mb = PhiAI.create_batches(Y, X, 10)
+    # print(mb[0][1].shape)
     # plot data
     # digit_phi.digit_data.plot_data(X[5])
     # print(Y[5])
-    #digit_phi.predict(np.array([X[0]]))
+    digit_phi_batched.predict(mb[0][1])
+    digit_phi_batched.adjust(Y, X, 'minibatch')
+    # digit_phi.predict(np.array([X[0]]))
     #print('Guessed: ', digit_phi.layers[digit_phi.size-1].output)
     #print('Expected: ', Y[0])
     #print('Error: ', digit_phi.loss(Y[0]))
     #print('Error Sum: ', np.sum(digit_phi.loss(Y[0])))
     #print('--------------------------------')
-    #digit_phi.adjust(Y[0])
+    # digit_phi.adjust(Y[0])
     #minibatches = PhiAI.create_batches(Y, X, 10)
     #print(len(minibatches[len(minibatches)-1][1][0]))
-    digit_phi.adjust(Y, X, 'minibatch', 10)
+    #digit_phi_batched.adjust(Y, X, 'minibatch')
     #digit_phi.predict(np.array([X[0]]))
     #print(f'Adjusted Guess: {digit_phi.layers[digit_phi.size - 1].output}')
     #print(f'Expected: {Y[0]}')
