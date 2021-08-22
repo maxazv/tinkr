@@ -76,33 +76,32 @@ class PhiAI:
         if stochastic:
             return val
         else:
+            """[!] Batch size might not represent current input dimensions"""
             return 1/batch_size * np.sum(val, axis=(0, 1))
 
-    """ TO BE RESEARCHED/ IMPLEMENTED """
     def minibatch_gd(self, y_train, x_train, batch_size, max_epochs=1000):
         minibatches = self.create_batches(y_train, x_train, batch_size)
-        mse = 0
-        for i in range(len(minibatches)):
+        mse = 100
+        for i in range(1):  # usually len(minibatches) but im testing
             if i > max_epochs:
                 return
             if mse < 0.01:
                 return
             self.predict(minibatches[i][1])
-            self.backprop(minibatches[i][0], False, batch_size)
-            mse = np.sum(self.loss(minibatches[i][0]))
+            #self.backprop(np.array([minibatches[i][0]]), False, batch_size)
+            #mse = np.sum(self.loss(np.array([minibatches[i][0]])))
+            return mse
 
-    """ TO BE TESTED """
     @staticmethod
     def create_batches(y_t, x_t, batch_size):
         minibatches = []
-        minbatch = []
-        for i in range(y_t.size):
-            minbatch.append(np.array([y_t, x_t]))
-            if i % batch_size == 0:
-                minibatches.append(minbatch)
-                minbatch = []
+        for i in range(y_t.shape[0]//batch_size):
+            y_batch = y_t[i*batch_size:(i+1)*batch_size]
+            x_batch = x_t[i*batch_size:(i+1)*batch_size]
+            minibatches.append([y_batch, x_batch])
+
         if y_t.size % batch_size != 0:
-            minibatches.append(minbatch)
+            minibatches.append([y_batch, x_batch])
         return minibatches
 
     def train(self, training, max_epochs=250, lowest_err=0.01):

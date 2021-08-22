@@ -142,22 +142,24 @@ def test_digit_ai():
     # plot data
     # digit_phi.digit_data.plot_data(X[5])
     # print(Y[5])
-    digit_phi.predict(np.array([X[0]]))
+    #digit_phi.predict(np.array([X[0]]))
     #print('Guessed: ', digit_phi.layers[digit_phi.size-1].output)
     #print('Expected: ', Y[0])
     #print('Error: ', digit_phi.loss(Y[0]))
     #print('Error Sum: ', np.sum(digit_phi.loss(Y[0])))
     #print('--------------------------------')
-    digit_phi.adjust(Y[0])
-    #digit_phi.adjust(Y, X, 'minibatch', 32)
-    digit_phi.predict(np.array([X[0]]))
+    #digit_phi.adjust(Y[0])
+    #minibatches = PhiAI.create_batches(Y, X, 10)
+    #print(len(minibatches[len(minibatches)-1][1][0]))
+    digit_phi.adjust(Y, X, 'minibatch', 10)
+    #digit_phi.predict(np.array([X[0]]))
     #print(f'Adjusted Guess: {digit_phi.layers[digit_phi.size - 1].output}')
     #print(f'Expected: {Y[0]}')
     #print(f'Adjusted Guess Error: {np.sum(digit_phi.loss(Y[0]))}')
 
 
 if __name__ == '__main__':
-    digit = 1
+    digit = 0
     if digit == 0:
         test_digit_ai()
     else:
