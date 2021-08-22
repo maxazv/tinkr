@@ -27,6 +27,19 @@ class PhiAI:
                 return x * (1 - x)
         return 0
 
+    @staticmethod
+    def create_batches(y_t, x_t, batch_size):
+        minibatches = []
+        y_batch, x_batch = None, None
+        for i in range(y_t.shape[0] // batch_size):
+            y_batch = y_t[i * batch_size:(i + 1) * batch_size]
+            x_batch = x_t[i * batch_size:(i + 1) * batch_size]
+            minibatches.append([y_batch, x_batch])
+
+        if y_t.size % batch_size != 0:
+            minibatches.append([y_batch, x_batch])
+        return minibatches
+
     def loss(self, target):
         return (target - self.layers[self.size - 1].output) ** 2
 
@@ -77,7 +90,6 @@ class PhiAI:
         else:
             delta_b = delta * self.lr
             self.layers[0].b -= np.array([(1/delta.shape[0]) * np.sum(delta_b, axis=0)])
-
             delta_w = np.zeros(self.layers[0].w.shape)
             for j in range(delta.shape[0]):
                 tnsp_delta = np.array([delta[j]]).T
@@ -99,19 +111,6 @@ class PhiAI:
             self.predict(minibatches[i][1])
             self.backprop(np.array(minibatches[i][0]), False)
             mse = np.sum(1/self.batch_size*self.loss(np.array([minibatches[i][0]])))
-
-    @staticmethod
-    def create_batches(y_t, x_t, batch_size):
-        minibatches = []
-        y_batch, x_batch = None, None
-        for i in range(y_t.shape[0]//batch_size):
-            y_batch = y_t[i*batch_size:(i+1)*batch_size]
-            x_batch = x_t[i*batch_size:(i+1)*batch_size]
-            minibatches.append([y_batch, x_batch])
-
-        if y_t.size % batch_size != 0:
-            minibatches.append([y_batch, x_batch])
-        return minibatches
 
     def train(self, training, max_epochs=250, lowest_err=0.01):
         """Utilises self.predict as well as self.adjust to optimise the Neural Network to the given data `training`"""
@@ -154,16 +153,3 @@ class PhiAI:
         Y_t, X_t = self.digit_data.setup_data(j, k)
         train_data_y = DigitData.one_hot(Y_t)
         return train_data_y, X_t
-
-    def train_digit(self, train_y, train_x, max_epochs=500, lowest_err=0.1):
-        err, c = 0, 0
-        for i in range(max_epochs):
-            self.predict(train_x[i])
-            self.adjust(train_y[i])
-            err += (train_y[i] - self.layers[self.size - 1].output) ** 2
-            if c % 5 == 0:
-                print('Iteration: ', c)
-                if err < lowest_err:
-                    return -1
-                err = 0
-        return 1

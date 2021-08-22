@@ -172,7 +172,8 @@ def test_digit_ai():
 
 
 if __name__ == '__main__':
-    digit = 1
+    digit = 0
+    """ TODO: CHECK IF MULTIPLE OUTPUT POSSIBLE """
     if digit == 0:
         test_digit_ai()
     else:
