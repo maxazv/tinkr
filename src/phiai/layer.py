@@ -19,7 +19,7 @@ class Layer:
         a = np.matmul(data, self.w) + self.b
         self.z = a
         if activation:
-            self.output = np.log(1 + np.power(math.e, a))
+            self.output = np.log(1 + np.exp(a))
             return self.output
         self.output = a
 

@@ -4,7 +4,7 @@ from src.phiai.layer import Layer
 from src.data_config import DigitData
 
 class PhiAI:
-    def __init__(self, layer_shapes, last_activation=False, batch_size=1):
+    def __init__(self, layer_shapes, last_activation=False, batch_size=1, lr=0.05):
         """Neural Network Class with layer-format described by `layer_shapes` - made by maxazv"""
         self.size = len(layer_shapes) - 1
         self.last_input = None
@@ -12,7 +12,7 @@ class PhiAI:
 
         self.output = self.layers[self.size-1].output
 
-        self.lr = 0.05
+        self.lr = lr
         self.last_activation = last_activation
         self.batch_size = batch_size
 
@@ -22,7 +22,7 @@ class PhiAI:
     def __activation(x, method='log', prime=True):
         if prime:
             if method == 'log':
-                return math.e ** x / (1 + math.e ** x)
+                return np.exp(x) / (1 + np.exp(x))
             elif method == 'sigmoid':
                 return x * (1 - x)
         return 0
@@ -93,18 +93,19 @@ class PhiAI:
             self.layers[0].w -= (1/delta.shape[0]) * delta_w
         return True
 
-    def minibatch_gd(self, y_train, x_train, max_epochs=1000):
+    def minibatch_gd(self, y_train, x_train, max_epochs=80000):
         minibatches = self.create_batches(y_train, x_train, self.batch_size)
         mse = 100
-        for i in range(1):  # usually len(minibatches) but im testing
+        print("Epochs: ", len(minibatches))
+        for i in range(len(minibatches)):
             if i > max_epochs:
                 return
             if mse < 0.01:
+                print('REACHED')
                 return
             self.predict(minibatches[i][1])
             self.backprop(np.array(minibatches[i][0]), False)
-            #mse = np.sum(self.loss(np.array([minibatches[i][0]])))
-            return mse
+            mse = np.sum(1/self.batch_size*self.loss(np.array([minibatches[i][0]])))
 
     @staticmethod
     def create_batches(y_t, x_t, batch_size):
@@ -155,9 +156,9 @@ class PhiAI:
         return model
 
     # digit data configuration and training
-    def load_data(self, path='res/train.csv'):
+    def load_data(self, path='res/train.csv', j=1000, k=60000):
         self.digit_data.load(path)
-        Y_t, X_t = self.digit_data.setup_data()
+        Y_t, X_t = self.digit_data.setup_data(j, k)
         train_data_y = DigitData.one_hot(Y_t)
         return train_data_y, X_t
 

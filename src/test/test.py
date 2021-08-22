@@ -115,7 +115,6 @@ def test_ai(ptest, verbose=0, testcase=0):
         print(f'Adjusted Guess: {nnv2.layers[nnv2.size - 1].output}')
         print(f'Expected: {t_data[test_i][1]}')
         print(f'Adjusted Guess Error: {nnv2.loss(t_data[test_i][1])}')
-        # print(nnv2.layers[0].output.shape)
 
         if verbose > 1:
             nnv2.train(t_data)
@@ -133,36 +132,46 @@ def test_ai(ptest, verbose=0, testcase=0):
             print("Predicted:", nnv2.loss(t_data[2][1]))
 
 def test_digit_ai():
-    #digit_phi = PhiAI([784, 15, 15, 10], True)
-    digit_phi_batched = PhiAI([784, 15, 15, 10], True, 10)
+    digit_phi = PhiAI([784, 15, 15, 10], True, lr=0.0000001)
+    size = 1
+    digit_phi_batched = PhiAI([784, 15, 15, 10], True, size, lr=0.00007)
     # configure target and corresponding data set
     Y, X = digit_phi_batched.load_data()
     X = digit_phi_batched.digit_data.normalize(X, 255)
-    mb = PhiAI.create_batches(Y, X, 10)
-    # print(mb[0][1].shape)
+    mb = PhiAI.create_batches(Y, X, size)
     # plot data
-    # digit_phi.digit_data.plot_data(X[5])
-    # print(Y[5])
+    #digit_phi_batched.digit_data.plot_data(X[5])
+    #print(Y[5])
+    """ BATCHED """
+    '''
     digit_phi_batched.predict(mb[0][1])
+    print(np.sum(1/size*digit_phi_batched.loss(mb[0][0])))
+    # digit_phi_batched.backprop(np.array(mb[0][0]), False)
+    #digit_phi_batched.predict(mb[0][1])
+    #print(np.sum(1/10*digit_phi_batched.loss(mb[0][0])))
     digit_phi_batched.adjust(Y, X, 'minibatch')
-    # digit_phi.predict(np.array([X[0]]))
-    #print('Guessed: ', digit_phi.layers[digit_phi.size-1].output)
-    #print('Expected: ', Y[0])
-    #print('Error: ', digit_phi.loss(Y[0]))
-    #print('Error Sum: ', np.sum(digit_phi.loss(Y[0])))
-    #print('--------------------------------')
-    # digit_phi.adjust(Y[0])
-    #minibatches = PhiAI.create_batches(Y, X, 10)
-    #print(len(minibatches[len(minibatches)-1][1][0]))
-    #digit_phi_batched.adjust(Y, X, 'minibatch')
-    #digit_phi.predict(np.array([X[0]]))
-    #print(f'Adjusted Guess: {digit_phi.layers[digit_phi.size - 1].output}')
-    #print(f'Expected: {Y[0]}')
-    #print(f'Adjusted Guess Error: {np.sum(digit_phi.loss(Y[0]))}')
+    digit_phi_batched.predict(mb[0][1])
+    print(np.sum(1/size*digit_phi_batched.loss(mb[0][0])))
+    print('Random Predict: ', digit_phi_batched.predict(X[0]))
+    print('Expect: ', Y[0])
+    '''
+    """ STOCHASTIC """
+    #'''
+    digit_phi.predict(np.array([X[0]]))
+    print('Guessed: ', digit_phi.layers[digit_phi.size-1].output)
+    print('Expected: ', Y[0])
+    print('Error Sum: ', np.sum(digit_phi.loss(Y[0])))
+    print('--------------------------------')
+    digit_phi.adjust(Y[0])
+    digit_phi.predict(np.array([X[0]]))
+    print(f'Adjusted Guess: {digit_phi.layers[digit_phi.size - 1].output}')
+    print(f'Expected: {Y[0]}')
+    print(f'Adjusted Guess Error: {np.sum(digit_phi.loss(Y[0]))}')
+    #'''
 
 
 if __name__ == '__main__':
-    digit = 1
+    digit = 0
     if digit == 0:
         test_digit_ai()
     else:
