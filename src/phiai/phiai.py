@@ -7,7 +7,7 @@ class PhiAI:
     def __init__(self, layer_shapes, last_activation=False, batch_size=1):
         """Neural Network Class with layer-format described by `layer_shapes` - made by maxazv"""
         self.size = len(layer_shapes) - 1
-        self.last_input = -1
+        self.last_input = None
         self.layers = [Layer(layer_shapes[i], layer_shapes[i+1]) for i in range(self.size)]
 
         self.output = self.layers[self.size-1].output
@@ -60,42 +60,37 @@ class PhiAI:
                 self.layers[i].b -= delta * self.lr
                 self.layers[i].w -= np.matmul(delta.T, self.layers[i - 1].output).T * self.lr
             else:
-                print("\n", i)
                 delta_b = delta * self.lr
-                print(delta_b.shape)
-                print(self.layers[i].b.shape)
-                print(np.array([1/self.batch_size * np.sum(delta_b, axis=0)]).shape)
                 """[!] Batch size might not represent current input dimensions"""
-                self.layers[i].b -= np.array([1/self.batch_size * np.sum(delta_b, axis=1)])
-
+                self.layers[i].b -= np.array([(1/delta.shape[0]) * np.sum(delta_b, axis=0)])
+                '''
                 tnsp_delta = np.array([delta[0]]).T
                 tnsp_output = np.array([self.layers[i-1].output[0]])
+                print(tnsp_output.shape)
                 delta_w = np.matmul(tnsp_delta, tnsp_output).T * self.lr
-                for j in range(delta.shape[0]-1):
+                '''
+                delta_w = np.zeros(self.layers[i].w.shape)
+                for j in range(delta.shape[0]):
                     tnsp_delta = np.array([delta[j]]).T
                     tnsp_output = np.array([self.layers[i-1].output[j]])
                     delta_w += np.matmul(tnsp_delta, tnsp_output).T * self.lr
-                self.layers[i].w -= 1/self.batch_size * delta_w
+                self.layers[i].w -= (1/delta.shape[0]) * delta_w
 
             delta = np.matmul(self.layers[i].w, delta.T).T * self.__activation(self.layers[i - 1].z.T, 'log', True).T
 
-        print('REACHED')
         if stochastic:
             self.layers[0].b -= delta * self.lr
             self.layers[0].w -= np.matmul(delta.T, self.last_input).T * self.lr
         else:
-            delta = delta
             delta_b = delta * self.lr
-            self.layers[0].b -= np.array([1/self.batch_size * np.sum(delta_b, axis=1)])
+            self.layers[0].b -= np.array([(1/delta.shape[0]) * np.sum(delta_b, axis=0)])
 
-            tnsp_delta = np.array([delta[0]]).T
-            tnsp_output = np.array([self.layers[0].output[0]])
-            delta_w = np.matmul(tnsp_delta, tnsp_output).T * self.lr
-            for j in range(delta.shape[0] - 1):
+            delta_w = np.zeros(self.layers[0].w.shape)
+            for j in range(delta.shape[0]):
                 tnsp_delta = np.array([delta[j]]).T
-                tnsp_output = np.array([self.layers[0].output[j]])
+                tnsp_output = np.array([self.last_input[j]])
                 delta_w += np.matmul(tnsp_delta, tnsp_output).T * self.lr
-            self.layers[0].w -= 1 / self.batch_size * delta_w
+            self.layers[0].w -= (1/delta.shape[0]) * delta_w
         return True
 
     def minibatch_gd(self, y_train, x_train, max_epochs=1000):

@@ -162,7 +162,7 @@ def test_digit_ai():
 
 
 if __name__ == '__main__':
-    digit = 0
+    digit = 1
     if digit == 0:
         test_digit_ai()
     else:
