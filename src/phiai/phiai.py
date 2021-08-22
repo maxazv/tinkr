@@ -112,7 +112,7 @@ class PhiAI:
             self.backprop(np.array(minibatches[i][0]), False)
             mse = np.sum(1/self.batch_size*self.loss(np.array([minibatches[i][0]])))
 
-    def train(self, training, max_epochs=250, lowest_err=0.01):
+    def train(self, training, max_epochs=500, lowest_err=0.01):
         """Utilises self.predict as well as self.adjust to optimise the Neural Network to the given data `training`"""
         c, err, i = (0, ) * 3
         while c < max_epochs:

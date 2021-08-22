@@ -157,7 +157,7 @@ def test_digit_ai():
     print('Expect: ', Y[0])
     '''
     """ STOCHASTIC """
-    #'''
+    '''
     digit_phi.predict(np.array([X[0]]))
     print('Guessed: ', digit_phi.layers[digit_phi.size-1].output)
     print('Expected: ', Y[0])
@@ -168,11 +168,11 @@ def test_digit_ai():
     print(f'Adjusted Guess: {digit_phi.layers[digit_phi.size-1].output}')
     print(f'Expected: {Y[0]}')
     print(f'Adjusted Guess Error: {np.sum(digit_phi.loss(Y[0]))}')
-    #'''
+    '''
 
 
 if __name__ == '__main__':
-    digit = 0
+    digit = 1
     """ TODO: CHECK IF MULTIPLE OUTPUT POSSIBLE """
     if digit == 0:
         test_digit_ai()
