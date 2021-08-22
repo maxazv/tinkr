@@ -1,5 +1,4 @@
 import numpy as np
-import math
 
 class Layer:
     def __init__(self, data_n, output_n):
@@ -12,15 +11,18 @@ class Layer:
         self.form = (data_n, output_n)
         self.activation = False
 
-    """ OVERFLOW ERROR """
-    def ff(self, data, activation=True):
+    def ff(self, data, activation=True, af='log'):
         """Calculates the output of a single Layer with the according weights, biases and provided data"""
         self.activation = activation
         a = np.matmul(data, self.w) + self.b
         self.z = a
         if activation:
-            self.output = np.log(1 + np.exp(a))
-            return self.output
+            if af == 'log':
+                self.output = np.log(1 + np.exp(a))
+                return self.output
+            elif af == 'sigmoid':
+                self.output = 1 / (1 + np.exp(-a))
+                return self.output
         self.output = a
 
         return self.output

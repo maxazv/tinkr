@@ -1,10 +1,9 @@
 import numpy as np
-import math
 from src.phiai.layer import Layer
 from src.data_config import DigitData
 
 class PhiAI:
-    def __init__(self, layer_shapes, last_activation=False, batch_size=1, lr=0.05):
+    def __init__(self, layer_shapes, last_activation=False, batch_size=1, lr=0.05, af='log'):
         """Neural Network Class with layer-format described by `layer_shapes` - made by maxazv"""
         self.size = len(layer_shapes) - 1
         self.last_input = None
@@ -14,6 +13,7 @@ class PhiAI:
 
         self.lr = lr
         self.last_activation = last_activation
+        self.af = af
         self.batch_size = batch_size
 
         self.digit_data = DigitData()
@@ -35,10 +35,10 @@ class PhiAI:
         self.last_input = data
         curr_output = data
         for i in range(len(self.layers)):
-            if i == len(self.layers) - 1:
-                return self.layers[i].ff(curr_output, self.last_activation)
+            if i == len(self.layers)-1:
+                return self.layers[i].ff(curr_output, self.last_activation, self.af)
 
-            curr_output = self.layers[i].ff(curr_output)
+            curr_output = self.layers[i].ff(curr_output, af=self.af)
         self.output = self.layers[self.size - 1].output
         return curr_output
 
@@ -53,7 +53,7 @@ class PhiAI:
     def backprop(self, target, stochastic=True):
         delta = -2 * (target - self.layers[self.size - 1].output)
         if self.layers[self.size - 1].activation:
-            delta *= self.__activation(self.layers[self.size - 1].z.T, 'log', True).T
+            delta *= self.__activation(self.layers[self.size - 1].z.T, self.af, True).T
 
         for i in range(self.size - 1, 0, -1):
             if stochastic:
@@ -61,14 +61,7 @@ class PhiAI:
                 self.layers[i].w -= np.matmul(delta.T, self.layers[i - 1].output).T * self.lr
             else:
                 delta_b = delta * self.lr
-                """[!] Batch size might not represent current input dimensions"""
                 self.layers[i].b -= np.array([(1/delta.shape[0]) * np.sum(delta_b, axis=0)])
-                '''
-                tnsp_delta = np.array([delta[0]]).T
-                tnsp_output = np.array([self.layers[i-1].output[0]])
-                print(tnsp_output.shape)
-                delta_w = np.matmul(tnsp_delta, tnsp_output).T * self.lr
-                '''
                 delta_w = np.zeros(self.layers[i].w.shape)
                 for j in range(delta.shape[0]):
                     tnsp_delta = np.array([delta[j]]).T
@@ -76,7 +69,7 @@ class PhiAI:
                     delta_w += np.matmul(tnsp_delta, tnsp_output).T * self.lr
                 self.layers[i].w -= (1/delta.shape[0]) * delta_w
 
-            delta = np.matmul(self.layers[i].w, delta.T).T * self.__activation(self.layers[i - 1].z.T, 'log', True).T
+            delta = np.matmul(self.layers[i].w, delta.T).T * self.__activation(self.layers[i - 1].z.T, self.af, True).T
 
         if stochastic:
             self.layers[0].b -= delta * self.lr

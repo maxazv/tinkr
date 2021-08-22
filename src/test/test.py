@@ -132,18 +132,19 @@ def test_ai(ptest, verbose=0, testcase=0):
             print("Predicted:", nnv2.loss(t_data[2][1]))
 
 def test_digit_ai():
-    digit_phi = PhiAI([784, 15, 15, 10], True, lr=0.0000001)
-    size = 1
-    digit_phi_batched = PhiAI([784, 15, 15, 10], True, size, lr=0.00007)
+    digit_phi = PhiAI([784, 15, 15, 10], True, lr=0.00001, af='sigmoid')
     # configure target and corresponding data set
-    Y, X = digit_phi_batched.load_data()
-    X = digit_phi_batched.digit_data.normalize(X, 255)
-    mb = PhiAI.create_batches(Y, X, size)
+    Y, X = digit_phi.load_data()
+    X = digit_phi.digit_data.normalize(X, 255)
     # plot data
     #digit_phi_batched.digit_data.plot_data(X[5])
     #print(Y[5])
     """ BATCHED """
     '''
+    size = 32
+    digit_phi_batched = PhiAI([784, 15, 15, 10], True, size, lr=0.00007)
+    
+    mb = PhiAI.create_batches(Y, X, size)
     digit_phi_batched.predict(mb[0][1])
     print(np.sum(1/size*digit_phi_batched.loss(mb[0][0])))
     # digit_phi_batched.backprop(np.array(mb[0][0]), False)
@@ -164,14 +165,14 @@ def test_digit_ai():
     print('--------------------------------')
     digit_phi.adjust(Y[0])
     digit_phi.predict(np.array([X[0]]))
-    print(f'Adjusted Guess: {digit_phi.layers[digit_phi.size - 1].output}')
+    print(f'Adjusted Guess: {digit_phi.layers[digit_phi.size-1].output}')
     print(f'Expected: {Y[0]}')
     print(f'Adjusted Guess Error: {np.sum(digit_phi.loss(Y[0]))}')
     #'''
 
 
 if __name__ == '__main__':
-    digit = 0
+    digit = 1
     if digit == 0:
         test_digit_ai()
     else:
