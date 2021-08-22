@@ -19,9 +19,9 @@ class Layer:
         self.activation = activation
         a = np.matmul(data, self.w) + self.b
         self.z = a
-        # overflow in power
         if activation:
             self.output = np.log(1 + np.power(math.e, a))
             return self.output
         self.output = a
+
         return self.output

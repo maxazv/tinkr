@@ -44,27 +44,66 @@ class PhiAI:
     def adjust(self, y_train, x_train=None, method='stochastic', batch_size=10):
         """Adjusts Weights and Biases based on the calculated Gradients with `method`"""
         if method == 'stochastic':
-            self.stochastic_gd(y_train)
+            self.backprop(y_train)
         elif method == 'minibatch':
             self.minibatch_gd(y_train, x_train, batch_size)
 
-    def stochastic_gd(self, target):
+    def backprop(self, target, stochastic=True, batch_size=0):
         delta = -2 * (target - self.layers[self.size - 1].output)
         if self.layers[self.size - 1].activation:
             delta *= self.__activation(self.layers[self.size - 1].z.T, 'log', True).T
 
         for i in range(self.size - 1, 0, -1):
-            self.layers[i].b -= delta * self.lr
-            self.layers[i].w -= np.matmul(delta.T, self.layers[i - 1].output).T * self.lr
+            delta_b = delta * self.lr
+            delta_w = np.matmul(delta.T, self.layers[i - 1].output).T * self.lr
+            if stochastic:
+                # orig: self.layers[i].b -= delta * self.lr
+                # orig: self.layers[i].w -= np.matmul(delta.T, self.layers[i - 1].output).T * self.lr
+                self.layers[i].b -= self.__fit(delta_b)
+                self.layers[i].w -= self.__fit(delta_w)
+            else:
+                self.layers[i].b -= self.__fit(delta_b, stochastic, batch_size)
+                self.layers[i].w -= self.__fit(delta_w, stochastic, batch_size)
+
             delta = np.matmul(self.layers[i].w, delta.T).T * self.__activation(self.layers[i - 1].z.T, 'log', True).T
 
         self.layers[0].b -= delta * self.lr
         self.layers[0].w -= np.matmul(delta.T, self.last_input).T * self.lr
         return True
 
+    @staticmethod
+    def __fit(val, stochastic=True, batch_size=0):
+        if stochastic:
+            return val
+        else:
+            return 1/batch_size * np.sum(val, axis=(0, 1))
+
     """ TO BE RESEARCHED/ IMPLEMENTED """
     def minibatch_gd(self, y_train, x_train, batch_size, max_epochs=1000):
-        pass
+        minibatches = self.create_batches(y_train, x_train, batch_size)
+        mse = 0
+        for i in range(len(minibatches)):
+            if i > max_epochs:
+                return
+            if mse < 0.01:
+                return
+            self.predict(minibatches[i][1])
+            self.backprop(minibatches[i][0], False, batch_size)
+            mse = np.sum(self.loss(minibatches[i][0]))
+
+    """ TO BE TESTED """
+    @staticmethod
+    def create_batches(y_t, x_t, batch_size):
+        minibatches = []
+        minbatch = []
+        for i in range(y_t.size):
+            minbatch.append(np.array([y_t, x_t]))
+            if i % batch_size == 0:
+                minibatches.append(minbatch)
+                minbatch = []
+        if y_t.size % batch_size != 0:
+            minibatches.append(minbatch)
+        return minibatches
 
     def train(self, training, max_epochs=250, lowest_err=0.01):
         """Utilises self.predict as well as self.adjust to optimise the Neural Network to the given data `training`"""
