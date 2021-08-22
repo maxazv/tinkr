@@ -65,7 +65,7 @@ window.rowconfigure(0, weight=1)
 window.columnconfigure(0, weight=1)
 
 menubar = Menu(window)
-window.config(menu=menubar)
+window.config(menu=menubar, bg='white smoke')
 submenu = Menu(menubar, tearoff=0)
 menubar.add_cascade(label='File', menu=submenu)
 submenu.add_command(label='New Canvas', command=new_canvas)

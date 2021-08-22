@@ -5,10 +5,7 @@ from src.data_config import DigitData
 
 class PhiAI:
     def __init__(self, layer_shapes, last_activation=False):
-        """
-        Neural Network Class - made by Max
-        :param layer_shapes: Structure of the Neural Network in List-Format
-        """
+        """Neural Network Class with layer-format described by `layer_shapes` - made by maxazv"""
         self.size = len(layer_shapes) - 1
         self.last_input = -1
         self.layers = [Layer(layer_shapes[i], layer_shapes[i + 1]) for i in range(self.size)]
@@ -32,11 +29,7 @@ class PhiAI:
         return (target - self.layers[self.size - 1].output) ** 2
 
     def predict(self, data):
-        """
-        Calculates output based on weights and biases and stores result in self.layers (feedforward)
-        :param data: Data to be processed by Phi-Neural-Network
-        :return: Returns the calculated output
-        """
+        """Calculates output based on weights and biases and stores result in self.layers (feedforward)"""
         self.last_input = data
         curr_output = data
         for i in range(len(self.layers)):
@@ -49,13 +42,7 @@ class PhiAI:
 
     # train and default train model
     def adjust(self, y_train, x_train=None, method='stochastic', batch_size=10):
-        """
-        Adjusts Weights and Biases based on the calculated Gradients
-        :param y_train: The expected Output for the last used Inputs
-        :param x_train: Neural Network Input Data
-        :param method: Gradient Descent Variant to use 'stochastic' or 'minibatch'
-        :param batch_size: If minibatch Algorithm is used; batch size of minibatch
-        """
+        """Adjusts Weights and Biases based on the calculated Gradients with `method`"""
         if method == 'stochastic':
             self.stochastic_gd(y_train)
         elif method == 'minibatch':
@@ -80,12 +67,7 @@ class PhiAI:
         pass
 
     def train(self, training, max_epochs=250, lowest_err=0.01):
-        """
-        Utilises self.predict as well as self.adjust to optimise the Neural Network to the given data
-        :param training: The training data in List-Format: [[Input, Expected], ...]
-        :param max_epochs: The maximum training iterations before the Neural Network stops its training
-        :param lowest_err: The lowest error value before the Neural Network stops its training
-        """
+        """Utilises self.predict as well as self.adjust to optimise the Neural Network to the given data `training`"""
         c, err, i = (0, ) * 3
         while c < max_epochs:
             self.adjust(training[i][1])

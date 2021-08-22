@@ -3,12 +3,7 @@ import math
 
 class Layer:
     def __init__(self, data_n, output_n):
-        """
-        Utilised by the phiai a single Layer which consists of Weights, Biases, "activated"-Value and an
-        Output based on the previous named Parameters
-        :param data_n: Amount of Neurons of (the previous) Layer
-        :param output_n: Amount of Neurons of the next Layer
-        """
+        """Single Neural Network Layer of shape (`data_n`, `output_n`)"""
         self.w = np.random.normal(0, 1, size=(data_n, output_n))
         self.b = np.zeros((1, output_n))
 
@@ -20,12 +15,7 @@ class Layer:
 
     """ OVERFLOW ERROR """
     def ff(self, data, activation=True):
-        """
-        Calculates the output of a single Layer with the according weights, biases and provided data
-        :param data: The Contents/ Output of the previous Layer
-        :param activation: Whether the Output should be transformed via an Activation-Function
-        :return: Output of the Layer in numpy.arr-format
-        """
+        """Calculates the output of a single Layer with the according weights, biases and provided data"""
         self.activation = activation
         a = np.matmul(data, self.w) + self.b
         self.z = a
