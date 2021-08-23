@@ -3,7 +3,7 @@ from src.phiai.layer import Layer
 from src.data_config import DataConfig
 
 class PhiAI:
-    def __init__(self, layer_shapes, last_activation=False, batch_size=1, lr=0.1):
+    def __init__(self, layer_shapes, last_activation=False, batch_size=1, lr=0.15):
         """Neural Network Class with layer-format described by `layer_shapes` - made by maxazv"""
         self.size = len(layer_shapes) - 1
         self.last_input = None
@@ -43,13 +43,15 @@ class PhiAI:
         self.layers[0].w = self.layers[0].w - dW * self.lr
 
     def train(self, X, Y, epochs=1000, verbose=10):
+        acc = 0
         for i in range(epochs):
             self.predict(X)
             self.backprop(X, Y)
             if i % verbose == 0:
                 print('\nEpoch: ', i)
-                print('Accuracy: ', self.accuracy(self.argmax(self.layers[self.size-1].output), Y))
-        return self.model_to_list()
+                acc = self.accuracy(self.argmax(self.layers[self.size-1].output), Y)
+                print('Accuracy: ', acc)
+        return self.model_to_list(), acc
 
     @staticmethod
     def argmax(A):

@@ -1,5 +1,4 @@
 import math
-import numpy as np
 from src.phiai.phiai import PhiAI
 from src.data_config import DataConfig
 
@@ -138,10 +137,11 @@ X_train, Y_train = dc.setup_data()
 X_train = dc.normalize(X_train, 255.)
 
 
-def test_digit_ai():
+def new_digit_model(threshold=0.8):
     phiai = PhiAI([784, 10, 10], lr=0.15)
-    phiai.train(X_train, Y_train, epochs=750)
-    phiai.save_model()
+    _, accuracy = phiai.train(X_train, Y_train, epochs=750)
+    if accuracy >= threshold:
+        phiai.save_model()
 
 
 def test_trained_model(path, idx=0):
@@ -157,7 +157,7 @@ def test_trained_model(path, idx=0):
 
 
 if __name__ == '__main__':
-    #test_digit_ai()
+    #new_digit_model()
     test_trained_model('C:/Users/Asus/Desktop/models/86.npz')
     '''
     digit = 0

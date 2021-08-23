@@ -2,7 +2,11 @@ from tkinter import *
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2
+from phiai.phiai import PhiAI
 
+
+trained = PhiAI([784, 10, 10])
+trained.load_model('res/trained/86.npz')
 
 curr_x, curr_y = 0, 0
 data = []
@@ -39,7 +43,7 @@ def extract_pixel_data():
             img[data[i][0], data[i][1]] = 1
     return img
 
-def input_data(plot=True):
+def input_data(plot=True, predict=True):
     grid_data = extract_pixel_data().T
     grid_data = cv2.resize(grid_data, (28, 28))
 
@@ -47,7 +51,11 @@ def input_data(plot=True):
         plt.figure(figsize=(7, 7))
         plt.imshow(grid_data, interpolation='none', cmap='gray')
         plt.show()
-    return grid_data
+    if predict:
+        x_data = grid_data.reshape(grid_data.size, 1)
+        trained.predict(x_data)
+        predict = trained.argmax(trained.layers[trained.size - 1].output)
+        print("Predicted: ", predict)
 
 def display_pallete():
     idC = canvas.create_rectangle((10, 10, 30, 30), fill='black')
