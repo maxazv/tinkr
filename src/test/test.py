@@ -1,7 +1,5 @@
-# import numpy as np
 import math
 from src.phiai.phiai import PhiAI
-# from src.phiai.phiai import Layer
 from src.data_config import DataConfig
 
 def delta_log(x):
@@ -137,13 +135,11 @@ def test_ai(ptest, verbose=0, testcase=0):
 def test_digit_ai():
     dc = DataConfig()
     dc.load()
-    X, Y = dc.setup_data()
-    Y = dc.one_hot(Y)
+    X_train, Y_train = dc.setup_data()
+    X_train = dc.normalize(X_train, 255.)
 
-    phiai = PhiAI([784, 10, 10], lr=0.00000001)
-    #print(X.shape)
-    #phiai.predict(X)
-    phiai.train(X, Y)
+    phiai = PhiAI([784, 10, 10], lr=0.1)
+    phiai.train(X_train, Y_train, epochs=1000)
 
 
 if __name__ == '__main__':

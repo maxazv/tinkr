@@ -19,7 +19,8 @@ class Layer:
 
     @staticmethod
     def softmax(Z):
-        return np.exp(Z) / sum(np.exp(Z))
+        A = np.exp(Z) / sum(np.exp(Z))
+        return A
 
     def ff(self, data, funct='relu', activation=True):
         """Calculates the output of a single Layer with the according weights, biases and provided data"""
