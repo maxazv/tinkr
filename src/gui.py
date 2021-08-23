@@ -5,8 +5,9 @@ import cv2
 from phiai.phiai import PhiAI
 
 
-trained = PhiAI([784, 10, 10])
-trained.load_model('res/trained/86.npz')
+#trained = PhiAI([784, 10, 10])
+trained = PhiAI([784, 20, 20, 10], lr=0.0985)
+trained.load_model('res/trained/90.npz')
 
 curr_x, curr_y = 0, 0
 data = []

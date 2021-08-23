@@ -32,10 +32,11 @@ class PhiAI:
         for i in range(self.size-1, 0, -1):
             dB = 1 / Y.size * np.sum(local_gradient)
             dW = 1 / Y.size * local_gradient.dot(self.layers[i-1].output.T)
+            #dW = 1 / Y.size * np.matmul(local_gradient, self.layers[i-1].output.T)
             self.layers[i].b = self.layers[i].b - dB * self.lr
             self.layers[i].w = self.layers[i].w - dW * self.lr
 
-            local_gradient = self.layers[i].w.T.dot(local_gradient) * Layer.relu(self.layers[i].z, True)
+            local_gradient = self.layers[i].w.T.dot(local_gradient)  # * Layer.relu(self.layers[i].z, True)
 
         dB = 1 / Y.size * np.sum(local_gradient)
         dW = 1 / Y.size * local_gradient.dot(X.T)
@@ -81,6 +82,6 @@ class PhiAI:
     def load_model(self, path='res/models.npz'):
         model = np.load(path)
         key = 'arr_'
-        for i in range((self.size-1)*2):
+        for i in range(self.size):
             self.layers[i].w = model[key + str(i*2)]
             self.layers[i].b = model[key + str((i*2)+1)]

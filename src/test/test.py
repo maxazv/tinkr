@@ -137,9 +137,10 @@ X_train, Y_train = dc.setup_data()
 X_train = dc.normalize(X_train, 255.)
 
 
-def new_digit_model(threshold=0.8):
-    phiai = PhiAI([784, 10, 10], lr=0.15)
-    _, accuracy = phiai.train(X_train, Y_train, epochs=750)
+def new_digit_model(threshold=0.9):
+    phiai = PhiAI([784, 20, 20, 10], lr=0.0985)
+    #phiai = PhiAI([784, 10, 10], lr=0.15)
+    _, accuracy = phiai.train(X_train, Y_train, epochs=1150)
     if accuracy >= threshold:
         phiai.save_model()
 

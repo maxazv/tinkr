@@ -27,6 +27,7 @@ class Layer:
         self.activation = activation
 
         self.z = self.w.dot(data) + self.b
+        #self.z = np.matmul(self.w, data) + self.b
         if activation:
             if funct == 'relu':
                 self.output = self.relu(self.z)
