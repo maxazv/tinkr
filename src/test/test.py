@@ -1,4 +1,5 @@
 import math
+import numpy as np
 from src.phiai.phiai import PhiAI
 from src.data_config import DataConfig
 
@@ -131,21 +132,33 @@ def test_ai(ptest, verbose=0, testcase=0):
             print("\nExpected:", t_data[2][1])
             print("Predicted:", nnv2.loss(t_data[2][1]))
 '''
+dc = DataConfig()
+dc.load()
+X_train, Y_train = dc.setup_data()
+X_train = dc.normalize(X_train, 255.)
+
 
 def test_digit_ai():
-    dc = DataConfig()
-    dc.load()
-    X_train, Y_train = dc.setup_data()
-    X_train = dc.normalize(X_train, 255.)
-
-    phiai = PhiAI([784, 10, 10], lr=0.1)
-    phiai.train(X_train, Y_train, verbose=50)
+    phiai = PhiAI([784, 10, 10], lr=0.15)
+    phiai.train(X_train, Y_train, epochs=750)
     phiai.save_model()
 
 
+def test_trained_model(path, idx=0):
+    trained = PhiAI([784, 10, 10])
+    trained.load_model(path)
+
+    img = X_train[:, idx, None]
+    dc.plot_data(img)
+    print("Expected: ", Y_train[idx])
+    trained.predict(img)
+    predict = trained.argmax(trained.layers[trained.size-1].output)
+    print("Predicted: ", predict)
+
+
 if __name__ == '__main__':
-    test_digit_ai()
-    #test = np.load('res/models.npz')
+    #test_digit_ai()
+    test_trained_model('C:/Users/Asus/Desktop/models/86.npz')
     '''
     digit = 0
     if digit == 0:

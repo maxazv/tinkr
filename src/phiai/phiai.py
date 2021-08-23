@@ -78,9 +78,7 @@ class PhiAI:
 
     def load_model(self, path='res/models.npz'):
         model = np.load(path)
-        for i in range(self.size):
-            key = 'arr_' + str(i)
-            if i % 2 == 1:
-                self.layers[i].b = model[key]
-            else:
-                self.layers[i].w = model[key]
+        key = 'arr_'
+        for i in range((self.size-1)*2):
+            self.layers[i].w = model[key + str(i*2)]
+            self.layers[i].b = model[key + str((i*2)+1)]
