@@ -157,8 +157,8 @@ def test_trained_model(path, idx=0):
 
 
 if __name__ == '__main__':
-    #new_digit_model()
-    test_trained_model('C:/Users/Asus/Desktop/models/86.npz')
+    new_digit_model()
+    #test_trained_model('C:/Users/Asus/Desktop/models/86.npz')
     '''
     digit = 0
     if digit == 0:
