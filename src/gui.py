@@ -59,6 +59,7 @@ def display_pallete():
 
 
 window = Tk()
+window.iconbitmap("res/cutie.ico")
 window.title("phiAI")
 window.geometry("750x450")
 window.rowconfigure(0, weight=1)
