@@ -42,14 +42,14 @@ class PhiAI:
         self.layers[0].b = self.layers[0].b - dB * self.lr
         self.layers[0].w = self.layers[0].w - dW * self.lr
 
-    def train(self, X, Y, epochs=500):
+    def train(self, X, Y, epochs=1000, verbose=10):
         for i in range(epochs):
             self.predict(X)
             self.backprop(X, Y)
-            if i % 10 == 0:
+            if i % verbose == 0:
                 print('\nEpoch: ', i)
                 print('Accuracy: ', self.accuracy(self.argmax(self.layers[self.size-1].output), Y))
-        return self.pull_model()
+        return self.model_to_list()
 
     @staticmethod
     def argmax(A):
@@ -65,23 +65,22 @@ class PhiAI:
         for i in range(max_epochs):
             pass
 
-    # load current nn model
-    def load_model(self, layers):
-        if len(self.layers) != len(layers):
-            return False
-        for i in range(len(layers)):
-            shape = layers[i][0].shape
-            if shape != self.layers[i].form:
-                return False
-            curr = Layer(shape[0], shape[1])
-            curr.w = layers[i][0]
-            curr.b = layers[i][1]
-            self.layers[i] = curr
-        return True
-
-    # extract current nn model
-    def pull_model(self):
+    def model_to_list(self):
         model = []
         for i in range(self.size):
-            model.append((self.layers[i].w, self.layers[i].b))
+            model.append(self.layers[i].w)
+            model.append(self.layers[i].b)
         return model
+
+    def save_model(self, path='res/models.npz'):
+        model = self.model_to_list()
+        np.savez(path, *model)
+
+    def load_model(self, path='res/models.npz'):
+        model = np.load(path)
+        for i in range(self.size):
+            key = 'arr_' + str(i)
+            if i % 2 == 1:
+                self.layers[i].b = model[key]
+            else:
+                self.layers[i].w = model[key]

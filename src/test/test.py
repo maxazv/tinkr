@@ -139,14 +139,17 @@ def test_digit_ai():
     X_train = dc.normalize(X_train, 255.)
 
     phiai = PhiAI([784, 10, 10], lr=0.1)
-    phiai.train(X_train, Y_train, epochs=1000)
+    phiai.train(X_train, Y_train, verbose=50)
+    phiai.save_model()
 
 
 if __name__ == '__main__':
+    test_digit_ai()
+    #test = np.load('res/models.npz')
+    '''
     digit = 0
     if digit == 0:
         test_digit_ai()
-    '''
     else:
         test = 2
         verbose_level = 1
