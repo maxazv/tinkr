@@ -21,8 +21,8 @@ class PhiAI:
         curr_output = data
         for i in range(len(self.layers)):
             if i == len(self.layers)-1:
-                return self.layers[i].ff(curr_output, 'softmax')
-            curr_output = self.layers[i].ff(curr_output, 'relu')
+                return self.layers[i].fforward(curr_output, 'softmax')
+            curr_output = self.layers[i].fforward(curr_output, 'relu')
         return curr_output
 
     def backprop(self, X, Y):

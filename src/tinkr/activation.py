@@ -1,13 +1,14 @@
 import numpy as np
+from layer import Layer
 
-class Activation:
-    def __init__(self, a, a_prime):
-        self.a = a
+class Activation(Layer):
+    def __init__(self, activate, a_prime):
+        self.activate = activate
         self.a_prime = a_prime
 
-    def activate(self, x):
+    def fforward(self, x):
         self.input = x
         return self.activate(x)
 
-    def backprop(self, x):
-        return np.multiply()
+    def bprop(self, gradient, lr):
+        return np.multiply(gradient, self.a_prime(self.input))
