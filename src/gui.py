@@ -2,7 +2,7 @@ from tkinter import *
 import numpy as np
 import matplotlib.pyplot as plt
 import cv2
-from phiai.phiai import PhiAI
+from tinkr.phiai import PhiAI
 
 
 #trained = PhiAI([784, 10, 10])
