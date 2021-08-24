@@ -1,7 +1,7 @@
 from dense import Dense
 from activations import Tanh
 from loss import mse, mse_prime
-from data_config import DataConfig
+# from data_config import DataConfig
 
 import numpy as np
 
