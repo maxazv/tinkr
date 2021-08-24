@@ -1,5 +1,5 @@
 import numpy as np
-from src.tinkr.layer import Layer
+from src.phiai.layer import Layer
 from src.data_config import DataConfig
 
 class PhiAI:
@@ -32,11 +32,12 @@ class PhiAI:
         for i in range(self.size-1, 0, -1):
             dB = 1 / Y.size * np.sum(local_gradient)
             dW = 1 / Y.size * local_gradient.dot(self.layers[i-1].output.T)
-            #dW = 1 / Y.size * np.matmul(local_gradient, self.layers[i-1].output.T)
             self.layers[i].b = self.layers[i].b - dB * self.lr
             self.layers[i].w = self.layers[i].w - dW * self.lr
 
-            local_gradient = self.layers[i].w.T.dot(local_gradient) * Layer.relu(self.layers[i].z, True)
+            local_gradient = self.layers[i].w.T.dot(local_gradient)
+            if self.layers[i].activation:
+                local_gradient *= Layer.relu(self.layers[i-1].z, True)
 
         dB = 1 / Y.size * np.sum(local_gradient)
         dW = 1 / Y.size * local_gradient.dot(X.T)

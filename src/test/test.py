@@ -1,5 +1,5 @@
 import math
-from src.tinkr.phiai import PhiAI
+from src.phiai.phiai import PhiAI
 from src.data_config import DataConfig
 
 def delta_log(x):
@@ -68,7 +68,7 @@ def test_ai(ptest, verbose=0, testcase=0):
         """ -***-[ Neural Network Class ]-***- """
         nn = PhiAI([1, 2, 1])
 
-        # Test tinkr Class
+        # Test phiai Class
         # + first prediction
         nn.predict(np.array([t_data[test_i][0]]))
         n_v1 = nn.layers[nn.size - 1].output
@@ -138,9 +138,9 @@ X_train = dc.normalize(X_train, 255.)
 
 
 def new_digit_model(threshold=0.9):
-    phiai = PhiAI([784, 20, 20, 10], lr=0.0985)
-    #tinkr = PhiAI([784, 10, 10], lr=0.15)
-    _, accuracy = phiai.train(X_train, Y_train, epochs=1150)
+    phiai = PhiAI([784, 20, 20, 10], lr=0.05)
+    #phiai = PhiAI([784, 10, 10], lr=0.15)
+    _, accuracy = phiai.train(X_train, Y_train, epochs=900)
     if accuracy >= threshold:
         phiai.save_model()
 
