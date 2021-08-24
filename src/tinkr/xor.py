@@ -1,6 +1,7 @@
 from dense import Dense
 from activations import Tanh
 from loss import mse, mse_prime
+from data_config import DataConfig
 
 import numpy as np
 
@@ -43,6 +44,9 @@ def predict(X, tinkr):
 def main():
     # data/ hyperparameter configuration
     X, Y, tinkr = config_data([2, 3, 1])
+    # mb = DataConfig.create_batches(Y, X, 3)
+    # minibatch[batch][0 = Y-Values & 1 = X-Values]
+    # print(mb[1][1])
     epochs = 3000
     lr = 0.063
     # train the model

@@ -1,6 +1,6 @@
 import numpy as np
 from src.phiai.layer import Layer
-from src.data_config import DataConfig
+from src.tinkr.data_config import DataConfig
 
 class PhiAI:
     def __init__(self, layer_shapes, last_activation=False, batch_size=1, lr=0.15):
