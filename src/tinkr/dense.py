@@ -11,7 +11,7 @@ class Dense(Layer):
         self.input = x
         return self.w.dot(x) + self.b
 
-    def bprop(self, gradient, lr):
+    def bprop(self, gradient, lr, batch_size):
         self.b = self.b - gradient * lr
         self.w = self.w - gradient.dot(self.input.T) * lr
         return self.w.T.dot(gradient)

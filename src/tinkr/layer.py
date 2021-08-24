@@ -6,5 +6,5 @@ class Layer:
     def fforward(self, x):
         pass
 
-    def bprop(self, gradient, lr):
+    def bprop(self, gradient, lr, batch_size):
         pass

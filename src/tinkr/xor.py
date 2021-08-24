@@ -30,7 +30,7 @@ for e in range(epochs):
         # backpropagation
         local_gradient = mse_prime(y, output)
         for layer in reversed(tinkr):
-            local_gradient = layer.bprop(local_gradient, lr)
+            local_gradient = layer.bprop(local_gradient, lr, 1)
 
     error /= len(X)
     print(f"{e + 1}/{epochs}, error={error}")

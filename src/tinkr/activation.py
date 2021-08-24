@@ -10,5 +10,5 @@ class Activation(Layer):
         self.input = x
         return self.activate(x)
 
-    def bprop(self, gradient, lr):
+    def bprop(self, gradient, lr, batch_size=1):
         return np.multiply(gradient, self.a_prime(self.input))
