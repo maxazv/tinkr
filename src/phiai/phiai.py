@@ -35,7 +35,9 @@ class PhiAI:
             self.layers[i].b = self.layers[i].b - dB * self.lr
             self.layers[i].w = self.layers[i].w - dW * self.lr
 
-            local_gradient = self.layers[i].w.T.dot(local_gradient)  # * Layer.relu(self.layers[i].z, True)
+            local_gradient = self.layers[i].w.T.dot(local_gradient)
+            if self.layers[i].activation:
+                local_gradient *= Layer.relu(self.layers[i-1].z, True)
 
         dB = 1 / Y.size * np.sum(local_gradient)
         dW = 1 / Y.size * local_gradient.dot(X.T)
