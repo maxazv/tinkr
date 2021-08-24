@@ -4,41 +4,51 @@ from loss import mse, mse_prime
 
 import numpy as np
 
-X = np.reshape([[0, 0], [0, 1], [1, 0], [1, 1]], (4, 2, 1))
-Y = np.reshape([[0], [1], [1], [0]], (4, 1, 1))
+def config_data(layer_shapes):
+    X = np.reshape([[0, 0], [0, 1], [1, 0], [1, 1]], (4, 2, 1))
+    Y = np.reshape([[0], [1], [1], [0]], (4, 1, 1))
 
-epochs = 10000
-lr = 0.1
+    tinkr = []
+    for i in range(len(layer_shapes)-1):
+        tinkr.append(Dense(layer_shapes[i], layer_shapes[i+1]))
+        tinkr.append(Tanh())
 
-tinkr = [
-    Dense(2, 3),
-    Tanh(),
-    Dense(3, 1),
-    Tanh()
-]
-# train
-for e in range(epochs):
-    error = 0
-    for x, y in zip(X, Y):
-        # feedforward
-        output = x
+    return X, Y, tinkr
+def train(epochs, X, Y, lr, tinkr, batch_size=1):
+    for e in range(epochs):
+        error = 0
+        for x, y in zip(X, Y):
+            # feedforward
+            output = x
+            for layer in tinkr:
+                output = layer.fforward(output)
+
+            error += mse(y, output)
+
+            # backpropagation
+            local_gradient = mse_prime(y, output)
+            for layer in reversed(tinkr):
+                local_gradient = layer.bprop(local_gradient, lr, batch_size)
+
+        error /= len(X)
+        print(f"{e + 1}/{epochs}, error={error}")
+def predict(X, tinkr):
+    print()
+    for x in X:
+        z = x
         for layer in tinkr:
-            output = layer.fforward(output)
+            z = layer.fforward(z)
+        print(x.tolist(), "->", z)
 
-        error += mse(y, output)
+def main():
+    # data/ hyperparameter configuration
+    X, Y, tinkr = config_data([2, 3, 1])
+    epochs = 3000
+    lr = 0.063
+    # train the model
+    train(epochs, X, Y, lr, tinkr)
+    # predictions by trained model
+    predict(X, tinkr)
 
-        # backpropagation
-        local_gradient = mse_prime(y, output)
-        for layer in reversed(tinkr):
-            local_gradient = layer.bprop(local_gradient, lr, 1)
 
-    error /= len(X)
-    print(f"{e + 1}/{epochs}, error={error}")
-
-# prediction
-print()
-for x in X:
-    z = x
-    for layer in tinkr:
-        z = layer.fforward(z)
-    print(x.tolist(), "->", z)
+main()
