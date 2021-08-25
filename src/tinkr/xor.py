@@ -48,11 +48,17 @@ def main():
     # minibatch[batch][0 = Y-Values & 1 = X-Values]
     # print(mb[1][1])
     epochs = 3000
-    lr = 0.063
+    lr = 0.02
     # train the model
-    train(epochs, X, Y, lr, tinkr)
+    train(epochs, X, Y, lr, tinkr, batch_size=1)
     # predictions by trained model
     predict(X, tinkr)
+    a = np.array([1, 2, 3])
+    b = np.array([4, 5, 6])
+    c = np.stack((a, b), 1)
+    d = np.sum(c, 1)
+    d = np.array([d])
+    print(d.reshape((d.size, 1)))
 
 
 main()
