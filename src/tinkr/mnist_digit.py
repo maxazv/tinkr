@@ -46,22 +46,25 @@ def train_minibatch(epochs, mb, lr, tinkr, batch_size):
 def train_stochastic(X, Y, epochs, lr, tinkr):
     for e in range(epochs):
         error = 0
-        for x, y in zip(X, Y):
+        for i in range(X.shape[1]):
             # feedforward
-            output = x
+            output = X[:, i, None]
             for layer in tinkr:
                 output = layer.fforward(output)
 
-            error += mse(y, output)
+            error += mse(Y[:, i, None], output)
+            if i == 0:
+                print("First Epoch Err: ", error)
 
             # backpropagation
-            local_gradient = mse_prime(y, output)
+            local_gradient = mse_prime(Y[:, i, None], output)
             for layer in reversed(tinkr):
                 local_gradient = layer.bprop(local_gradient, lr)
 
-        error /= len(X)
+        error /= X.shape[1]
         print(f"{e + 1}/{epochs}, error={error}")
     return tinkr
+
 def predict(X, tinkr):
     print()
     z = X
@@ -69,6 +72,22 @@ def predict(X, tinkr):
         z = layer.fforward(z)
     print(np.argmax(z))
     #print(np.argmax(z))
+def predict_sgd(X, Y, tinkr):
+    print()
+    for i in range(X.shape[1]):
+        z = X[:, i, None]
+        for layer in tinkr:
+            z = layer.fforward(z)
+        print(np.argmax(Y[:, i, None]), "->", np.around(z.reshape(1, z.size), 2))
+        print("Err: ", mse(Y[:, i, None], z))
+
+def save_model(model, path='../../res/models.npz'):
+    copy = []
+    for i in range(len(model)):
+        if i % 2 == 0:
+            copy.append(model[i].w)
+            copy.append(model[i].b)
+    np.savez(path, *copy)
 
 def main():
     # data/ hyperparameter configuration
@@ -80,14 +99,15 @@ def main():
                  Dense(15, 10),
                  ReLU()]
     _, _, X, Y = config_data([], 1)
-    x_sgd = X.reshape(X.shape[1], X.shape[0], 1)
+    # print(X[:, 4:5])
+    x_sgd = X
     y_sgd = DataConfig.one_hot(Y)
-    y_sgd = y_sgd.reshape(y_sgd.shape[1], y_sgd.shape[0], 1)
-    print(x_sgd.shape, y_sgd.shape)
-    epochs = 200
-    lr = 0.02
-    trained = train_stochastic(x_sgd, y_sgd, epochs, lr, digit_rec)
-    predict(x_sgd, trained)
+    epochs = 3
+    lr = 0.008  # 0.008 -> error=0.002290681273446552
+    digit_rec = train_stochastic(x_sgd, y_sgd, epochs, lr, digit_rec)
+    predict_sgd(x_sgd[:, 0:8], y_sgd[:, 0:8], digit_rec)
+    save_model(digit_rec)
+
 
     # tinkr = train_minibatch(epochs, minibatches, lr, tinkr, 10)
     # img = minibatches[0][1][:, 4, None]
