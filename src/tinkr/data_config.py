@@ -11,8 +11,8 @@ class DataConfig:
         self.path = ''
 
     @staticmethod
-    def one_hot(Y):
-        one_hot_Y = np.zeros((Y.size, Y.max() + 1))
+    def one_hot(Y, size=10):
+        one_hot_Y = np.zeros((Y.size, size))
         one_hot_Y[np.arange(Y.size), Y] = 1
         return one_hot_Y.T
 
@@ -30,12 +30,12 @@ class DataConfig:
         return dt
 
     @staticmethod
-    def create_batches(y_t, x_t, batch_size):
+    def create_batches(x_t, y_t, batch_size):
         minibatches = []
         y_batch, x_batch = None, None
         for i in range(y_t.shape[0] // batch_size):
             y_batch = y_t[i * batch_size:(i + 1) * batch_size]
-            x_batch = x_t[i * batch_size:(i + 1) * batch_size]
+            x_batch = x_t[:, i * batch_size:(i + 1) * batch_size]
             minibatches.append([y_batch, x_batch])
 
         if y_t.size % batch_size != 0:

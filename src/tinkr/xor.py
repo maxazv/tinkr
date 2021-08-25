@@ -1,7 +1,6 @@
 from dense import Dense
 from activations import Tanh
 from loss import mse, mse_prime
-# from data_config import DataConfig
 
 import numpy as np
 
@@ -16,6 +15,7 @@ def config_data(layer_shapes):
 
     return X, Y, tinkr
 def train(epochs, X, Y, lr, tinkr, batch_size=1):
+    # stochastic gradient descent (update after each example)
     for e in range(epochs):
         error = 0
         for x, y in zip(X, Y):
@@ -44,21 +44,12 @@ def predict(X, tinkr):
 def main():
     # data/ hyperparameter configuration
     X, Y, tinkr = config_data([2, 3, 1])
-    # mb = DataConfig.create_batches(Y, X, 3)
-    # minibatch[batch][0 = Y-Values & 1 = X-Values]
-    # print(mb[1][1])
-    epochs = 3000
+    epochs = 7500
     lr = 0.02
     # train the model
     train(epochs, X, Y, lr, tinkr, batch_size=1)
-    # predictions by trained model
+    #predictions by trained model
     predict(X, tinkr)
-    a = np.array([1, 2, 3])
-    b = np.array([4, 5, 6])
-    c = np.stack((a, b), 1)
-    d = np.sum(c, 1)
-    d = np.array([d])
-    print(d.reshape((d.size, 1)))
 
 
 main()
