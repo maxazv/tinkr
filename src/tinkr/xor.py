@@ -17,6 +17,7 @@ def config_data(layer_shapes):
 def train(epochs, X, Y, lr, tinkr, batch_size=1):
     # stochastic gradient descent (update after each example)
     for e in range(epochs):
+        print(X.shape, Y.shape)
         error = 0
         for x, y in zip(X, Y):
             # feedforward
@@ -44,7 +45,7 @@ def predict(X, tinkr):
 def main():
     # data/ hyperparameter configuration
     X, Y, tinkr = config_data([2, 3, 1])
-    epochs = 7500
+    epochs = 2000
     lr = 0.02
     # train the model
     train(epochs, X, Y, lr, tinkr, batch_size=1)
