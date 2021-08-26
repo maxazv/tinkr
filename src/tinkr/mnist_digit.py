@@ -63,6 +63,8 @@ def train_stochastic(X, Y, epochs, lr, tinkr):
 
         error /= X.shape[1]
         print(f"{e + 1}/{epochs}, error={error}")
+        if error < 0.025:
+            return tinkr
     return tinkr
 
 def predict(X, tinkr):
@@ -88,26 +90,35 @@ def save_model(model, path='../../res/models.npz'):
             copy.append(model[i].w)
             copy.append(model[i].b)
     np.savez(path, *copy)
+def load_model(ai, path='../../res/trained/uh.npz'):
+    model = np.load(path)
+    key = 'arr_'
+    c = 0
+    for i in range(len(ai)):
+        if i % 2 == 0:
+            ai[i].w = model[key + str(c*2)]
+            ai[i].b = model[key + str((c*2)+1)]
+            c += 1
+    return ai
 
 def main():
     # data/ hyperparameter configuration
     # minibatches, tinkr, _, _ = config_data([784, 20, 20, 10], 10)
-    digit_rec = [Dense(784, 15),
-                 ReLU(),
-                 Dense(15, 15),
+    digit_rec = [Dense(784, 20),
                  Tanh(),
-                 Dense(15, 10),
+                 Dense(20, 20),
+                 Tanh(),
+                 Dense(20, 10),
                  ReLU()]
     _, _, X, Y = config_data([], 1)
-    # print(X[:, 4:5])
     x_sgd = X
     y_sgd = DataConfig.one_hot(Y)
-    epochs = 3
+    epochs = 7
     lr = 0.008  # 0.008 -> error=0.002290681273446552
-    digit_rec = train_stochastic(x_sgd, y_sgd, epochs, lr, digit_rec)
-    predict_sgd(x_sgd[:, 0:8], y_sgd[:, 0:8], digit_rec)
-    save_model(digit_rec)
 
+    digit_rec = train_stochastic(x_sgd, y_sgd, epochs, lr, digit_rec)
+    predict_sgd(x_sgd[:, 0:10], y_sgd[:, 0:10], digit_rec)
+    save_model(digit_rec)
 
     # tinkr = train_minibatch(epochs, minibatches, lr, tinkr, 10)
     # img = minibatches[0][1][:, 4, None]
