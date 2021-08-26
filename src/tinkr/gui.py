@@ -3,34 +3,63 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cv2
 
+from dense import Dense
+from activations import *
+from loss import mse, mse_prime
+from data_config import DataConfig
+
+
+trained = [Dense(784, 200),
+           Sigmoid(),
+           Dense(200, 80),
+           Sigmoid(),
+           Dense(80, 10),
+           Sigmoid()]
+
 
 curr_x, curr_y = 0, 0
 data = []
 color = 'black'
 canvas_w, canvas_h = 280, 280
 
+def load_model(ai, path='../../res/trained/try.npz'):
+    model = np.load(path)
+    key = 'arr_'
+    c = 0
+    for i in range(len(ai)):
+        if i % 2 == 0:
+            ai[i].w = model[key + str(c*2)]
+            ai[i].b = model[key + str((c*2)+1)]
+            c += 1
+    return ai
+def predict_sgd(X_inp, tinkr, argmax=False):
+    z = X_inp
+    for layer in tinkr:
+        z = layer.fforward(z)
+    if argmax:
+        return np.argmax(z)
+    return np.around(z.reshape(1, z.size), 2)
+
+
+trained = load_model(trained)
 
 def locate_xy(event):
     global curr_x, curr_y
     curr_x, curr_y = event.x, event.y
-
 def add_line(event, width=int(canvas_w/28*2)):
     global curr_x, curr_y
     canvas.create_line((curr_x, curr_y, event.x, event.y), fill=color, smooth=1)
     curr_x, curr_y = event.x, event.y
     for i in range(width):
         data.append((int(curr_x-width/2+i), int(curr_y-width/2+i)))
-
 def show_color(new_color):
     global color
     color = new_color
-
 def new_canvas():
     global data
     canvas.delete('all')
     data = []
     display_pallete()
-
 def extract_pixel_data():
     global canvas_w, canvas_h, data
     img = np.zeros((canvas_w, canvas_h))
@@ -39,7 +68,7 @@ def extract_pixel_data():
             img[data[i][0], data[i][1]] = 1
     return img
 
-def input_data(plot=True):
+def input_data(plot=True, predict=True):
     grid_data = extract_pixel_data().T
     grid_data = cv2.resize(grid_data, (28, 28))
 
@@ -47,7 +76,10 @@ def input_data(plot=True):
         plt.figure(figsize=(7, 7))
         plt.imshow(grid_data, interpolation='none', cmap='gray')
         plt.show()
-    return grid_data
+    if predict:
+        x_data = grid_data.reshape(grid_data.size, 1)
+        pred = predict_sgd(x_data, trained, True)
+        print("Predicted: ", pred)
 
 def display_pallete():
     idC = canvas.create_rectangle((10, 10, 30, 30), fill='black')
@@ -59,6 +91,7 @@ def display_pallete():
 
 
 window = Tk()
+window.iconbitmap("../../res/cutie.ico")
 window.title("phiAI")
 window.geometry("750x450")
 window.rowconfigure(0, weight=1)
