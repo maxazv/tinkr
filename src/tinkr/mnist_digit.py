@@ -90,7 +90,7 @@ def save_model(model, path='../../res/models.npz'):
             copy.append(model[i].w)
             copy.append(model[i].b)
     np.savez(path, *copy)
-def load_model(ai, path='../../res/trained/uh.npz'):
+def load_model(ai, path='../../res/trained/maybe.npz'):
     model = np.load(path)
     key = 'arr_'
     c = 0
@@ -113,12 +113,13 @@ def main():
     _, _, X, Y = config_data([], 1)
     x_sgd = X
     y_sgd = DataConfig.one_hot(Y)
-    epochs = 7
-    lr = 0.008  # 0.008 -> error=0.002290681273446552
+    epochs = 3
+    lr = 0.01  # 0.008 -> error=~0.00229
 
-    digit_rec = train_stochastic(x_sgd, y_sgd, epochs, lr, digit_rec)
-    predict_sgd(x_sgd[:, 0:10], y_sgd[:, 0:10], digit_rec)
-    save_model(digit_rec)
+    #digit_rec = train_stochastic(x_sgd, y_sgd, epochs, lr, digit_rec)
+    digit_rec = load_model(digit_rec)
+    predict_sgd(x_sgd[:, 0:30], y_sgd[:, 0:30], digit_rec)
+    #save_model(digit_rec)
 
     # tinkr = train_minibatch(epochs, minibatches, lr, tinkr, 10)
     # img = minibatches[0][1][:, 4, None]

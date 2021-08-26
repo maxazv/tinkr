@@ -1,6 +1,7 @@
 import numpy as np
 from layer import Layer
 
+# TODO: Pls for the love of god implement me
 class Conv(Layer):
     def __init__(self, input_shape, filter_shape, depth):
         super(Conv, self).__init__()
