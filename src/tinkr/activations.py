@@ -31,3 +31,15 @@ class Tanh(Activation):
             return 1 - np.tanh(x) ** 2
 
         super().__init__(tanh, tanh_prime)
+
+class Softmax(Activation):
+    def __init__(self):
+        def softmax(x):
+            exps = np.exp(x - x.max())
+            return exps / sum(np.exp(x))
+
+        def softmax_prime(x):
+            sm = softmax(x)
+            return sm * (1 - sm)
+
+        super().__init__(softmax, softmax_prime)

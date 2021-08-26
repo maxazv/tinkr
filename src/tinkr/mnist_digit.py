@@ -1,8 +1,7 @@
 import random
 
 from dense import Dense
-from activations import ReLU
-from activations import Tanh
+from activations import *
 from loss import mse, mse_prime
 from data_config import DataConfig
 
@@ -74,14 +73,17 @@ def predict(X, tinkr):
         z = layer.fforward(z)
     print(np.argmax(z))
     #print(np.argmax(z))
-def predict_sgd(X, Y, tinkr):
+def predict_sgd(X, Y, tinkr, argmax=False):
     print()
     for i in range(X.shape[1]):
         z = X[:, i, None]
         for layer in tinkr:
             z = layer.fforward(z)
-        print(np.argmax(Y[:, i, None]), "->", np.around(z.reshape(1, z.size), 2))
-        print("Err: ", mse(Y[:, i, None], z))
+        pred = np.around(z.reshape(1, z.size), 2)
+        if argmax:
+            pred = np.argmax(pred)
+        print(np.argmax(Y[:, i, None]), "->", pred)
+        print('------')
 
 def save_model(model, path='../../res/models.npz'):
     copy = []
@@ -90,7 +92,7 @@ def save_model(model, path='../../res/models.npz'):
             copy.append(model[i].w)
             copy.append(model[i].b)
     np.savez(path, *copy)
-def load_model(ai, path='../../res/trained/maybe.npz'):
+def load_model(ai, path='../../res/trained/try.npz'):
     model = np.load(path)
     key = 'arr_'
     c = 0
@@ -104,21 +106,21 @@ def load_model(ai, path='../../res/trained/maybe.npz'):
 def main():
     # data/ hyperparameter configuration
     # minibatches, tinkr, _, _ = config_data([784, 20, 20, 10], 10)
-    digit_rec = [Dense(784, 20),
-                 Tanh(),
-                 Dense(20, 20),
-                 Tanh(),
-                 Dense(20, 10),
-                 ReLU()]
+    digit_rec = [Dense(784, 200),
+                 Sigmoid(),
+                 Dense(200, 80),
+                 Sigmoid(),
+                 Dense(80, 10),
+                 Sigmoid()]
     _, _, X, Y = config_data([], 1)
     x_sgd = X
     y_sgd = DataConfig.one_hot(Y)
-    epochs = 3
-    lr = 0.01  # 0.008 -> error=~0.00229
+    epochs = 5
+    lr = 0.015
 
     #digit_rec = train_stochastic(x_sgd, y_sgd, epochs, lr, digit_rec)
     digit_rec = load_model(digit_rec)
-    predict_sgd(x_sgd[:, 0:30], y_sgd[:, 0:30], digit_rec)
+    predict_sgd(x_sgd[:, 0:30], y_sgd[:, 0:30], digit_rec, True)
     #save_model(digit_rec)
 
     # tinkr = train_minibatch(epochs, minibatches, lr, tinkr, 10)
