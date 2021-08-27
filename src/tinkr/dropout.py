@@ -2,7 +2,7 @@ import numpy as np
 from layer import Layer
 
 class Dropout(Layer):
-    def __init__(self, training, rate=0.2):
+    def __init__(self, training=False, rate=0.35):
         self.rate = rate
         self.training = training
 

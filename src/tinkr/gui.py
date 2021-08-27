@@ -19,7 +19,7 @@ data = []
 color = 'black'
 canvas_w, canvas_h = 280, 280
 
-def load_model(ai, path='../../res/trained/try.npz'):
+def load_model(ai, path='../../res/trained/holup.npz'):
     model = np.load(path)
     key = 'arr_'
     c = 0

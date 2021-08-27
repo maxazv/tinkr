@@ -3,6 +3,21 @@ from activations import Tanh
 from loss import mse, mse_prime
 import numpy as np
 
+def unison_shuffle(a, b, axis):
+    copA = np.zeros(a.shape)
+    copB = np.zeros(b.shape)
+    idx_shuffle = np.arange(0, a.shape[axis])
+    np.random.shuffle(idx_shuffle)
+    if axis == 1:
+        for i in range(len(idx_shuffle)):
+            copA[:, idx_shuffle[i]] = a[:,i]
+            copB[:, idx_shuffle[i]] = b[:,i]
+        return copA, copB
+
+    for i in range(len(idx_shuffle)):
+        copA[idx_shuffle[i],:] = a[i,:]
+        copB[idx_shuffle[i],:] = b[i,:]
+    return copA, copB
 
 def config_data(layer_shapes, moment):
     X = np.reshape([[0, 0], [0, 1], [1, 0], [1, 1]], (4, 2, 1))
@@ -34,6 +49,7 @@ def train(epochs, X, Y, lr, tinkr, batch_size=1):
 
         error /= len(X)
         print(f"{e + 1}/{epochs}, error={error}")
+
 def predict(X, tinkr):
     print()
     for x in X:
