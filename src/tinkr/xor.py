@@ -1,4 +1,5 @@
 from dense import Dense
+from dropout import Dropout
 from activations import Tanh
 from loss import mse, mse_prime
 
@@ -43,13 +44,18 @@ def predict(X, tinkr):
         print(x.tolist(), "->", z)
 
 def main():
+    arr = np.random.random((5, 1))
+    print("Before: \n", arr)
+    do = Dropout(True, rate=0.5)
+    dropped = do.fforward(arr)
+    print("\nAfter: \n", dropped)
     # data/ hyperparameter configuration
     X, Y, tinkr = config_data([2, 3, 1])
     epochs = 2000
     lr = 0.02
     # train the model
     train(epochs, X, Y, lr, tinkr, batch_size=1)
-    #predictions by trained model
+    # predictions by trained model
     predict(X, tinkr)
 
 
