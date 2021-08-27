@@ -1,12 +1,9 @@
 from tkinter import *
-import numpy as np
 import matplotlib.pyplot as plt
 import cv2
 
 from dense import Dense
 from activations import *
-from loss import mse, mse_prime
-from data_config import DataConfig
 
 
 trained = [Dense(784, 200),

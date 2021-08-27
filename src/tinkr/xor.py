@@ -1,17 +1,16 @@
 from dense import Dense
-from dropout import Dropout
 from activations import Tanh
 from loss import mse, mse_prime
-
 import numpy as np
 
-def config_data(layer_shapes):
+
+def config_data(layer_shapes, moment):
     X = np.reshape([[0, 0], [0, 1], [1, 0], [1, 1]], (4, 2, 1))
     Y = np.reshape([[0], [1], [1], [0]], (4, 1, 1))
 
     tinkr = []
     for i in range(len(layer_shapes)-1):
-        tinkr.append(Dense(layer_shapes[i], layer_shapes[i+1]))
+        tinkr.append(Dense(layer_shapes[i], layer_shapes[i+1], momentum=moment))
         tinkr.append(Tanh())
 
     return X, Y, tinkr
@@ -44,14 +43,9 @@ def predict(X, tinkr):
         print(x.tolist(), "->", z)
 
 def main():
-    arr = np.random.random((5, 1))
-    print("Before: \n", arr)
-    do = Dropout(True, rate=0.5)
-    dropped = do.fforward(arr)
-    print("\nAfter: \n", dropped)
     # data/ hyperparameter configuration
-    X, Y, tinkr = config_data([2, 3, 1])
-    epochs = 2000
+    X, Y, tinkr = config_data([2, 3, 1], True)
+    epochs = 2000   # 2000
     lr = 0.02
     # train the model
     train(epochs, X, Y, lr, tinkr, batch_size=1)
