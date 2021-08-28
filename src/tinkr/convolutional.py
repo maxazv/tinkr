@@ -31,12 +31,11 @@ class Conv(Layer):
     def bprop(self, gradient, lr, batch_size):
         kernels_gradient = np.zeros(self.kernels_shape)
         input_gradient = np.zeros(self.input_shape)
-
         for i in range(self.depth):
             for j in range(self.input_depth):
                 kernels_gradient[i, j] = signal.correlate2d(self.input[j], gradient[i], "valid")
                 input_gradient[j] += signal.convolve2d(gradient[i], self.kernels[i, j], "full")
 
-        self.kernels -= lr * kernels_gradient
-        self.biases -= lr * gradient
+        self.kernels = self.kernels - lr * kernels_gradient
+        self.biases = self.biases - lr * gradient
         return input_gradient
