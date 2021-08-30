@@ -1,12 +1,9 @@
 from tkinter import *
-import numpy as np
 import matplotlib.pyplot as plt
 import cv2
 
 from dense import Dense
 from activations import *
-from loss import mse, mse_prime
-from data_config import DataConfig
 
 
 trained = [Dense(784, 200),
@@ -22,7 +19,7 @@ data = []
 color = 'black'
 canvas_w, canvas_h = 280, 280
 
-def load_model(ai, path='../../res/trained/try.npz'):
+def load_model(ai, path='../../res/trained/holup.npz'):
     model = np.load(path)
     key = 'arr_'
     c = 0

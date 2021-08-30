@@ -17,8 +17,8 @@ class Sigmoid(Activation):
             return 1 / (1 + np.exp(-x))
 
         def sigmoid_prime(x):
-            a = sigmoid(x)
-            return a * (1 - a)
+            s = sigmoid(x)
+            return s * (1 - s)
 
         super().__init__(sigmoid, sigmoid_prime)
 
